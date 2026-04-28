@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ED Imaging Queue Prioritization — Nebraska Medicine</title>
+<style>
+:root {
+  --bg: #eef0f2;
+  --surface: #ffffff;
+  --surface2: #f5f6f8;
+  --surface3: #eceef1;
+  --border: #c9cdd4;
+  --border-strong: #9aa3ae;
+  --text: #1a2332;
+  --text-muted: #4e5d6e;
+  --text-dim: #8e9baa;
+  --accent: #00539b;
+  --accent-light: #e4eef8;
+  --success: #1b5e20;
+  --warning: #7a3b00;
+  --danger: #9b1c1c;
+  --nav-bg: #1c3a5e;
+  --nav-text: #dce6f0;
+  --nav-sub: #8faabf;
+  --esi1: #9b1c1c; --esi2: #7c3100; --esi3: #7a5a00; --esi4: #1b5e20; --esi5: #00539b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 13px; }
+
+/* ── Header — dark navy nav bar (Epic-style) ── */
+.header { background: var(--nav-bg); border-bottom: 3px solid #0e2340; padding: 0 24px; display: flex; align-items: stretch; justify-content: space-between; gap: 16px; flex-wrap: wrap; min-height: 52px; }
+.header-left { display: flex; flex-direction: column; justify-content: center; padding: 10px 0; }
+.header-left h1 { font-size: 15px; font-weight: 600; color: var(--nav-text); letter-spacing: 0; }
+.header-left p { font-size: 11px; color: var(--nav-sub); margin-top: 2px; }
+.header-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(155,28,28,0.25); border: 1px solid rgba(155,28,28,0.5); padding: 4px 12px; border-radius: 2px; font-size: 11px; color: #f5a3a3; align-self: center; }
+
+/* ── API Panel ── */
+.api-panel { background: var(--surface); border-bottom: 1px solid var(--border); padding: 8px 24px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.api-panel label { font-size: 12px; color: var(--text-muted); white-space: nowrap; font-weight: 600; }
+.api-input { flex: 1; min-width: 200px; max-width: 400px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: 2px; font-size: 12px; font-family: 'Courier New', monospace; }
+.api-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,83,155,0.12); }
+.api-status { font-size: 11px; padding: 3px 10px; border-radius: 2px; white-space: nowrap; border: 1px solid; }
+.api-status.active { background: #f0f7f0; color: #1b5e20; border-color: #a5c8a5; }
+.api-status.inactive { background: var(--surface3); color: var(--text-muted); border-color: var(--border); }
+
+/* ── Controls ── */
+.controls { padding: 8px 24px; display: flex; gap: 6px; align-items: center; border-bottom: 1px solid var(--border); background: var(--surface); flex-wrap: wrap; }
+.btn { padding: 5px 14px; border-radius: 2px; border: 1px solid; cursor: pointer; font-size: 12px; font-weight: 500; transition: background 0.1s; line-height: 1.4; font-family: inherit; }
+.btn-primary { background: var(--accent); color: #fff; border-color: #004080; }
+.btn-primary:hover { background: #004080; }
+.btn-secondary { background: var(--surface2); color: var(--text); border-color: var(--border-strong); }
+.btn-secondary:hover { background: var(--surface3); }
+.btn-ghost { background: transparent; color: var(--text-muted); border-color: var(--border); }
+.btn-ghost:hover { background: var(--surface3); color: var(--text); }
+.stats-bar { margin-left: auto; display: flex; gap: 16px; align-items: center; font-size: 11px; color: var(--text-muted); flex-wrap: wrap; }
+.stats-bar strong { color: var(--text); font-weight: 600; }
+
+/* ── Dual Queue Layout ── */
+.main { display: grid; grid-template-columns: 230px 1fr; min-height: calc(100vh - 180px); }
+.queue-col { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+.queue-col:last-child { border-right: none; }
+.queue-head { position: sticky; top: 0; z-index: 10; background: var(--surface2); border-bottom: 2px solid var(--border); padding: 8px 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.queue-head.ai-head { border-bottom-color: var(--accent); background: #f0f5fb; }
+.queue-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text); }
+.queue-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.queue-badge { font-size: 10px; padding: 1px 7px; border-radius: 2px; font-weight: 600; border: 1px solid; flex-shrink: 0; }
+.queue-badge.fcfs { background: var(--surface3); color: var(--text-muted); border-color: var(--border); }
+.queue-badge.ai { background: var(--accent-light); color: var(--accent); border-color: #aac6e0; }
+.queue-body { padding: 7px; display: flex; flex-direction: column; gap: 4px; flex: 1; overflow-y: auto; }
+.empty-state { padding: 40px 14px; text-align: center; color: var(--text-dim); }
+.empty-state h3 { font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--text-muted); }
+.empty-state p { font-size: 11px; }
+
+/* ── FCFS Cards (compact list entries) ── */
+.fcfs-card { background: var(--surface); border: 1px solid var(--border); border-left-width: 3px; padding: 5px 8px; display: flex; align-items: center; gap: 7px; }
+.fcfs-card:hover { background: #fafbfc; }
+.fcfs-card.tier1 { border-left-color: var(--esi1); }
+.fcfs-card.tier2 { border-left-color: var(--esi2); }
+.fcfs-card.tier3 { border-left-color: var(--esi3); }
+.fcfs-card.tier4 { border-left-color: var(--esi4); }
+.fcfs-card.tier5, .fcfs-card.tier6 { border-left-color: var(--text-dim); }
+.rank-sm { width: 18px; height: 18px; border-radius: 50%; background: var(--surface3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
+
+/* ── AI Patient Cards (expandable records) ── */
+.ai-card { background: var(--surface); border: 1px solid var(--border); border-left-width: 3px; overflow: hidden; }
+.ai-card + .ai-card { border-top: none; }
+.ai-card.tier1 { border-left-color: var(--esi1); }
+.ai-card.tier2 { border-left-color: var(--esi2); }
+.ai-card.tier3 { border-left-color: var(--esi3); }
+.ai-card.tier4 { border-left-color: var(--esi4); }
+.ai-card.tier5, .ai-card.tier6 { border-left-color: var(--text-dim); }
+.ai-card.is-tie { outline: 1px solid #7aaed4; outline-offset: -1px; }
+.tie-banner { background: #f0f5fb; border-bottom: 1px solid #c0d8ec; padding: 3px 12px; font-size: 10px; color: var(--accent); font-weight: 600; }
+.ai-card-header { padding: 8px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; background: var(--surface); }
+.ai-card-header:hover { background: var(--surface2); }
+.ai-card-body { border-top: 1px solid var(--border); padding: 12px 14px 14px; background: var(--surface2); }
+.rank-circle { width: 24px; height: 24px; border-radius: 50%; background: var(--surface3); border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
+.patient-id { font-size: 13px; font-weight: 700; color: var(--text); font-family: inherit; }
+.cond-name { font-size: 11px; font-weight: 400; color: var(--text-muted); margin-top: 1px; }
+.esi-badge { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: 2px; font-size: 10px; font-weight: 700; border: 1px solid; }
+.esi-1 { background: #fdf0f0; color: var(--esi1); border-color: #e8a8a8; }
+.esi-2 { background: #fdf4ed; color: var(--esi2); border-color: #e8c08a; }
+.esi-3 { background: #fdf9e8; color: var(--esi3); border-color: #d4c060; }
+.esi-4 { background: #f0f7f0; color: var(--esi4); border-color: #90c090; }
+.esi-5 { background: #e8f2fb; color: var(--esi5); border-color: #8ab8d8; }
+.esi-unk { background: var(--surface3); color: var(--text-dim); border-color: var(--border); }
+.score-val { font-size: 20px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.score-val.crit { color: var(--esi1); }
+.score-val.high { color: var(--esi2); }
+.score-val.modhigh { color: var(--esi3); }
+.score-val.mod { color: var(--text-muted); }
+.score-lbl { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
+.conf-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 1px 7px; border-radius: 2px; border: 1px solid; font-weight: 600; }
+.conf-high { background: #f0f7f0; color: #1b5e20; border-color: #90c090; }
+.conf-mod { background: #fdf9e8; color: #7a5a00; border-color: #d4c060; }
+.conf-low { background: #fdf0f0; color: #9b1c1c; border-color: #e8a8a8; }
+
+/* ── Score table ── */
+.score-tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+.score-tbl thead tr { background: var(--surface3); }
+.score-tbl td { padding: 4px 6px; border: 1px solid var(--border); }
+.score-tbl td:first-child { color: var(--text-muted); width: 33%; background: var(--surface2); }
+.score-tbl td:nth-child(2) { color: var(--text); font-size: 10px; }
+.score-tbl td:last-child { text-align: right; font-family: 'Courier New', monospace; font-weight: 700; width: 38px; background: var(--surface2); }
+.score-tbl .trow-total td { background: var(--accent-light); border-top: 2px solid var(--border-strong); font-weight: 700; color: var(--accent); }
+
+/* ── Vitals grid ── */
+.vitals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 12px; }
+.vital-cell { background: var(--surface); border: 1px solid var(--border); padding: 5px 8px; }
+.vital-lbl { font-size: 9px; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.5px; font-weight: 600; }
+.vital-val { font-size: 12px; font-weight: 600; margin-top: 2px; color: var(--text); }
+
+/* ── Section label inside card ── */
+.sec-lbl { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 14px; margin-bottom: 5px; padding-bottom: 3px; border-bottom: 1px solid var(--border); }
+.sec-lbl.blue { color: var(--accent); border-bottom-color: #aac6e0; }
+
+/* ── Physician notes ── */
+.phys-notes { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 7px 10px; border-radius: 0; font-size: 12px; font-family: inherit; min-height: 66px; resize: vertical; }
+.phys-notes:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,83,155,0.1); }
+.phys-notes::placeholder { color: var(--text-dim); }
+
+/* ── Position Analysis ── */
+.pos-btn { padding: 5px 12px; border-radius: 2px; background: var(--accent-light); border: 1px solid #aac6e0; color: var(--accent); font-size: 12px; cursor: pointer; transition: background 0.1s; width: 100%; text-align: center; font-family: inherit; font-weight: 500; }
+.pos-btn:hover { background: #d0e4f4; border-color: var(--accent); }
+.pos-result { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 10px 12px; margin-top: 8px; font-size: 12px; line-height: 1.65; color: var(--text-muted); }
+.pos-result p { margin-bottom: 8px; }
+.pos-result p:last-child { margin-bottom: 0; }
+.pos-result strong { color: var(--text); }
+.l2-loading { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-muted); }
+.spinner { width: 13px; height: 13px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Add Patient Panel ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; }
+.overlay.open { display: block; }
+.add-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 460px; background: var(--surface); border-left: 1px solid var(--border); overflow-y: auto; z-index: 101; transform: translateX(100%); transition: transform 0.22s ease; }
+.add-panel.open { transform: translateX(0); }
+.panel-head { padding: 14px 20px; border-bottom: 2px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--surface2); z-index: 5; }
+.panel-head h2 { font-size: 14px; font-weight: 700; color: var(--text); }
+.close-x { background: transparent; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px 8px; border-radius: 2px; }
+.close-x:hover { background: var(--surface3); color: var(--text); }
+.panel-body { padding: 16px 20px; }
+.fg { margin-bottom: 12px; }
+.fg label { display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.fi, .fs, .fta { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 5px 9px; border-radius: 2px; font-size: 13px; transition: border-color 0.1s; font-family: inherit; }
+.fi:focus, .fs:focus, .fta:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,83,155,0.1); }
+.fs option { background: var(--surface); }
+.fta { min-height: 70px; resize: vertical; }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.frow3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.section-sep { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; padding: 5px 0 3px; border-bottom: 2px solid var(--border); margin: 14px 0 10px; }
+.cb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.cb-item { display: flex; align-items: center; gap: 7px; cursor: pointer; font-size: 12px; color: var(--text-muted); user-select: none; }
+.cb-item:hover { color: var(--text); }
+.panel-foot { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; position: sticky; bottom: 0; background: var(--surface2); }
+
+@media (max-width: 860px) {
+  .main { grid-template-columns: 1fr; }
+  .queue-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+  .add-panel { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════ HEADER ════ -->
+<header class="header">
+  <div class="header-left">
+    <h1>ED Imaging Queue Prioritization Model</h1>
+    <p>Nebraska Medicine &nbsp;|&nbsp; ESI Handbook v4 &nbsp;|&nbsp; AHA/ASA 2019 &nbsp;|&nbsp; NHAMCS 2021 &nbsp;|&nbsp; 54-Condition Clinical Reference</p>
+  </div>
+  <span class="header-badge">Proof-of-Concept — Not a Clinical Decision Support System</span>
+</header>
+
+<!-- ════ API KEY ════ -->
+<div class="api-panel">
+  <label for="apiKey">OpenAI API Key (Layer 2 AI Reasoning):</label>
+  <input type="password" class="api-input" id="apiKey" placeholder="sk-…" autocomplete="off" />
+  <span class="api-status inactive" id="apiStatus">Layer 2 Inactive — deterministic scoring only</span>
+</div>
+
+<!-- ════ CONTROLS ════ -->
+<div class="controls">
+  <button class="btn btn-primary" onclick="openPanel()">+ Add Patient</button>
+  <button class="btn btn-secondary" onclick="loadDemo()">Load Demo Scenario</button>
+  <button class="btn btn-ghost" onclick="clearAll()">Clear All</button>
+  <div class="stats-bar" id="statsBar"></div>
+</div>
+
+<!-- ════ DUAL QUEUE ════ -->
+<div class="main" id="mainGrid">
+  <div class="queue-col">
+    <div class="queue-head">
+      <div><div class="queue-title">Current (FCFS)</div><div class="queue-sub">Arrival order</div></div>
+      <span class="queue-badge fcfs">FCFS</span>
+    </div>
+    <div class="queue-body" id="fcfsQueue">
+      <div class="empty-state"><h3>No patients</h3><p>Load demo or add a patient.</p></div>
+    </div>
+  </div>
+  <div class="queue-col">
+    <div class="queue-head ai-head">
+      <div><div class="queue-title" style="color:var(--accent)">AI-Prioritized Queue</div><div class="queue-sub">Urgency score · click a card to expand</div></div>
+      <span class="queue-badge ai">AI</span>
+    </div>
+    <div class="queue-body" id="aiQueue">
+      <div class="empty-state"><h3>No patients scored</h3><p>Add patients to see AI-prioritized ranking.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ADD PATIENT PANEL ════ -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="add-panel" id="addPanel">
+  <div class="panel-head">
+    <h2>Add Patient to Queue</h2>
+    <button class="close-x" onclick="closePanel()">×</button>
+  </div>
+  <div class="panel-body">
+    <div class="frow">
+      <div class="fg"><label>Patient ID</label><input class="fi" id="f_id" placeholder="PT-007" /></div>
+      <div class="fg"><label>Arrival Time</label><input type="time" class="fi" id="f_arr" /></div>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label>ESI Level</label>
+        <select class="fs" id="f_esi">
+          <option value="">— Unknown —</option>
+          <option value="1">ESI 1 — Immediate</option>
+          <option value="2">ESI 2 — Emergent</option>
+          <option value="3">ESI 3 — Urgent</option>
+          <option value="4">ESI 4 — Semi-Urgent</option>
+          <option value="5">ESI 5 — Non-Urgent</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Sex</label>
+        <select class="fs" id="f_sex">
+          <option value="">Unknown</option>
+          <option value="M">Male</option>
+          <option value="F">Female</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Age (years)</label><input type="number" class="fi" id="f_age" min="0" max="120" placeholder="—" /></div>
+      <div class="fg">
+        <label>Arrived by Ambulance</label>
+        <select class="fs" id="f_amb">
+          <option value="false">No — walk-in</option>
+          <option value="true">Yes</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Chief Complaint(s)</label><textarea class="fta" id="f_complaint" placeholder="Describe presenting symptoms, onset, associated findings…"></textarea></div>
+
+    <div class="section-sep">Vital Signs</div>
+    <div class="frow3">
+      <div class="fg"><label>Temp (°F)</label><input type="number" class="fi" id="f_temp" step="0.1" placeholder="98.6" /></div>
+      <div class="fg"><label>HR (bpm)</label><input type="number" class="fi" id="f_hr" placeholder="72" /></div>
+      <div class="fg"><label>RR (br/min)</label><input type="number" class="fi" id="f_rr" placeholder="16" /></div>
+    </div>
+    <div class="frow3">
+      <div class="fg"><label>SBP (mmHg)</label><input type="number" class="fi" id="f_sbp" placeholder="120" /></div>
+      <div class="fg"><label>DBP (mmHg)</label><input type="number" class="fi" id="f_dbp" placeholder="80" /></div>
+      <div class="fg"><label>SpO2 (%)</label><input type="number" class="fi" id="f_spo2" min="0" max="100" placeholder="99" /></div>
+    </div>
+    <div class="fg" style="max-width:160px"><label>Pain Scale (0–10)</label><input type="number" class="fi" id="f_pain" min="0" max="10" placeholder="0" /></div>
+
+    <div class="section-sep">Imaging Ordered</div>
+    <div class="cb-grid">
+      <label class="cb-item"><input type="checkbox" id="f_ctHead" /> CT Head (non-contrast)</label>
+      <label class="cb-item"><input type="checkbox" id="f_ctChest" /> CT Chest</label>
+      <label class="cb-item"><input type="checkbox" id="f_ctAb" /> CT Abdomen/Pelvis</label>
+      <label class="cb-item"><input type="checkbox" id="f_ctpa" /> CTPA (PE protocol)</label>
+      <label class="cb-item"><input type="checkbox" id="f_ctContrast" /> IV Contrast Required</label>
+      <label class="cb-item"><input type="checkbox" id="f_mri" /> MRI</label>
+      <label class="cb-item"><input type="checkbox" id="f_mriGad" /> MRI + Gadolinium</label>
+      <label class="cb-item"><input type="checkbox" id="f_us" /> Ultrasound / Doppler</label>
+      <label class="cb-item"><input type="checkbox" id="f_xr" /> X-Ray</label>
+    </div>
+  </div>
+  <div class="panel-foot">
+    <button class="btn btn-ghost" onclick="closePanel()">Cancel</button>
+    <button class="btn btn-primary" onclick="submitPatient()">Add to Queue</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+//  CONSTANTS & SCORING TABLES
+// ════════════════════════════════════════════════════
+
+const ESI_BASE = {1:100, 2:75, 3:45, 4:15, 5:5};
+const ESI_LABELS = {1:'Immediate',2:'Emergent',3:'Urgent',4:'Semi-Urgent',5:'Non-Urgent'};
+const TIER_SCORE = {1:40, 2:30, 3:20, 4:10, 5:5, 6:0};
+
+// Condition library — each condition has:
+//   tier (1–6), weight (higher = more distinguishing key matches),
+//   keys (primary triggers — MUST match at least one),
+//   ctx (supporting context — bonus points if keys already matched)
+const CONDITIONS = [
+  // ── Tier 1: Catastrophic ──
+  {id:'tension_pneumo', name:'Tension Pneumothorax', tier:1, weight:8,
+   keys:['tension pneumo','pneumothorax','tracheal deviation','absent breath sound','absent breath'],
+   ctx:['dyspnea','shortness of breath','hypotension','chest trauma','breathing'],
+   timeWindow:'Death within minutes without decompression. No safe waiting window.',
+   imaging:'CXR / Clinical'},
+  {id:'ruptured_aaa', name:'Ruptured AAA', tier:1, weight:8,
+   keys:['ruptured aaa','ruptured aortic aneurysm','aaa rupture','aortic aneurysm rupture'],
+   ctx:['back pain','flank pain','abdominal pain','hypotension','known aaa','pulsatile mass'],
+   timeWindow:'Survival measured in minutes without OR. Free rupture 100% mortality without intervention.',
+   imaging:'POCUS → CTA → OR'},
+  {id:'cardiac_tamponade', name:'Cardiac Tamponade', tier:1, weight:8,
+   keys:['tamponade','beck\'s triad','pericardial tamponade','muffled heart'],
+   ctx:['hypotension','jvd','penetrating trauma','pericardial','pea arrest'],
+   timeWindow:'PEA inevitable without pericardiocentesis. Minutes from collapse to cardiac arrest.',
+   imaging:'POCUS Echo'},
+  {id:'stemi_shock', name:'STEMI with Cardiogenic Shock', tier:1, weight:8,
+   keys:['stemi','st elevation','st-elevation','cardiogenic shock','heart attack with shock'],
+   ctx:['hypotension','diaphoresis','crushing chest pain','bradycardia','cath lab'],
+   timeWindow:'Each 30-min delay increases 1-year mortality ~7.5%. Door-to-balloon target ≤90 min.',
+   imaging:'ECG → Angiography'},
+  {id:'aortic_dissection_a', name:'Aortic Dissection Type A', tier:1, weight:7,
+   keys:['aortic dissection type a','type a dissection','type-a dissection','stanford type a'],
+   ctx:['tearing pain','ripping pain','chest pain','back pain','pulse discrepancy','hypertension'],
+   timeWindow:'Mortality 1–2% per hour in first 48 hours. OR target within 2 hours of diagnosis.',
+   imaging:'CTA Chest'},
+  {id:'massive_hemothorax', name:'Massive Hemothorax', tier:1, weight:8,
+   keys:['hemothorax','massive hemothorax'],
+   ctx:['trauma','chest','hypotension','absent breath'],
+   timeWindow:'Near 100% mortality without drainage and source control.',
+   imaging:'CXR → CTA'},
+  {id:'ruptured_ectopic', name:'Ruptured Ectopic Pregnancy', tier:1, weight:8,
+   keys:['ruptured ectopic','ectopic rupture','ectopic pregnancy rupture'],
+   ctx:['pelvic pain','hypotension','positive hcg','pregnant','ectopic'],
+   timeWindow:'Leading cause of first-trimester maternal death. OR within minutes if hemodynamically unstable.',
+   imaging:'POCUS FAST → OR'},
+
+  // ── Tier 2: Critical ──
+  {id:'stroke_sx', name:'Acute Stroke Syndrome', tier:2, weight:10,
+   keys:['facial droop','face droop','facial weakness','arm weakness','arm weak','hemiplegia','hemiparesis'],
+   ctx:['speech','slurred','aphasia','sudden onset','focal deficit','unilateral','gaze deviation'],
+   timeWindow:'1.9M neurons die per minute. Door-to-CT ≤25 min. tPA window 4.5 hrs. Thrombectomy 6–24 hrs.',
+   imaging:'NCCT Head → CTA'},
+  {id:'ischemic_stroke', name:'Ischemic Stroke / LVO', tier:2, weight:9,
+   keys:['ischemic stroke','stroke','lvo','thrombectomy','tpa','tissue plasminogen','cerebrovascular'],
+   ctx:['facial droop','arm weakness','speech','aphasia','focal neuro','sudden onset'],
+   timeWindow:'1.9M neurons die per minute. Door-to-CT ≤25 min. tPA window 4.5 hrs. Thrombectomy 6–24 hrs.',
+   imaging:'NCCT Head → CTA'},
+  {id:'ich', name:'Hemorrhagic Stroke (ICH)', tier:2, weight:8,
+   keys:['ich','hemorrhagic stroke','intracerebral hemorrhage','intracranial bleed','intracranial hemorrhage'],
+   ctx:['headache','focal deficit','hypertension','declining gcs','altered mental','confusion'],
+   timeWindow:'Hematoma expands 20–40% within 3–6 hours. BP reduction to <140 most effective within 1 hour.',
+   imaging:'NCCT Head'},
+  {id:'sah', name:'Subarachnoid Hemorrhage (SAH)', tier:2, weight:9,
+   keys:['subarachnoid','sah','thunderclap','worst headache of life','worst headache ever','thunderclap headache','worst headache i have','worst headache in my'],
+   ctx:['headache','nausea','nuchal rigidity','stiff neck','photophobia','sudden onset','severe'],
+   timeWindow:'Rebleed 4–17% within 24 hrs, 50–80% mortality. CT within 25 min. Every hour unsecured = cumulative 3–4% daily rebleed risk.',
+   imaging:'NCCT Head → CTA'},
+  {id:'acute_limb_ischemia', name:'Acute Limb Ischemia (Grade IIb)', tier:2, weight:8,
+   keys:['acute limb ischemia','limb ischemia','six p\'s','6 p\'s','ischemic limb'],
+   ctx:['limb pain','pallor','pulseless','paresthesia','paralysis','cold limb','leg ischemia','arm ischemia'],
+   timeWindow:'6-hour critical window for limb salvage. Nerve failure at 1 hour; muscle necrosis at 6 hours.',
+   imaging:'CTA → OR/Angio'},
+  {id:'testicular_torsion', name:'Testicular Torsion', tier:2, weight:9,
+   keys:['testicular torsion','torsion','scrotal torsion','ovarian torsion'],
+   ctx:['scrotal pain','testicular pain','absent cremasteric','scrotal swelling','sudden scrotal','unilateral scrotal'],
+   timeWindow:'Testicular viability ~100% within 6 hours; <10% after 24 hours. OR within 6 hours.',
+   imaging:'Doppler US'},
+  {id:'orbital_compartment', name:'Orbital Compartment Syndrome', tier:2, weight:8,
+   keys:['orbital compartment','proptosis','lcic','lateral canthotomy'],
+   ctx:['orbital trauma','vision loss','iop','facial trauma','decreased vision','eye pressure'],
+   timeWindow:'Irreversible vision loss within 60–90 minutes. LCIC within 60 min of vision loss onset.',
+   imaging:'CT Orbits'},
+  {id:'boerhaave', name:'Boerhaave Syndrome', tier:2, weight:8,
+   keys:['boerhaave','esophageal rupture','esophageal perforation','mackler triad'],
+   ctx:['vomiting','chest pain','subcutaneous emphysema','hamman','mediastinitis'],
+   timeWindow:'Primary repair feasible <24 hrs. Mortality: <12 hrs 10–15%; >24 hrs >50%; untreated ~100%.',
+   imaging:'CT Chest + Gastrografin'},
+  {id:'ludwigs', name:"Ludwig's Angina / Epiglottitis (Airway)", tier:2, weight:8,
+   keys:['ludwig','epiglottitis','floor of mouth','retropharyngeal abscess','airway compromise'],
+   ctx:['stridor','drooling','trismus','airway','neck swelling','throat swelling'],
+   timeWindow:'Airway can close within hours. Awake fiberoptic intubation far safer than emergent.',
+   imaging:'CECT Neck'},
+  {id:'cauda_equina', name:'Cauda Equina Syndrome', tier:2, weight:9,
+   keys:['cauda equina','ces','saddle anesthesia','saddle area numbness','saddle numbness'],
+   ctx:['urinary retention','bowel incontinence','bilateral leg weakness','back pain','perineal numbness'],
+   timeWindow:'Surgical decompression ideally <6 hours. Permanent sphincter dysfunction if untreated >48–72 hrs.',
+   imaging:'MRI Lumbar Spine'},
+  {id:'epidural_hematoma', name:'Epidural Hematoma (Expanding)', tier:2, weight:8,
+   keys:['epidural hematoma','edh','epidural bleed'],
+   ctx:['trauma','lucid interval','blown pupil','deteriorating gcs','head trauma','loss of consciousness'],
+   timeWindow:'Arterial hemorrhage expanding over 6–8 hours. OR within 60–90 minutes of neurological deterioration.',
+   imaging:'NCCT Head'},
+  {id:'phlegmasia', name:'Phlegmasia Cerulea Dolens', tier:2, weight:8,
+   keys:['phlegmasia','phlegmasia cerulea','venous gangrene'],
+   ctx:['massive leg edema','cyanosis','motor deficit','sensory deficit','leg pain'],
+   timeWindow:'0–6 hours: limb salvage possible. >12–24 hours: irreversible venous gangrene.',
+   imaging:'Doppler US → CTV'},
+
+  // ── Tier 3: High ──
+  {id:'mesenteric_ischemia', name:'Acute Mesenteric Ischemia', tier:3, weight:8,
+   keys:['mesenteric ischemia','bowel ischemia','mesenteric artery occlusion'],
+   ctx:['abdominal pain','atrial fibrillation','af ','afib','elevated lactate','out of proportion','severe abdominal','pain out of proportion'],
+   timeWindow:'0–6 hours: bowel viability preserved. Mortality doubles once bowel necrosis occurs.',
+   imaging:'CTA Abdomen/Pelvis'},
+  {id:'cholangitis_severe', name:'Acute Cholangitis Grade III (Reynolds Pentad)', tier:3, weight:8,
+   keys:['cholangitis','charcot triad','reynolds pentad','ascending cholangitis','biliary sepsis'],
+   ctx:['fever','jaundice','confusion','hypotension','altered mental status','ruq pain','right upper quadrant','biliary'],
+   timeWindow:'Grade III: emergent ERCP within 12 hours. Mortality 20–50% without drainage.',
+   imaging:'RUQ US → MRCP/CT'},
+  {id:'subdural_hematoma', name:'Subdural Hematoma (Acute + GCS Decline)', tier:3, weight:8,
+   keys:['subdural hematoma','sdh','subdural bleed'],
+   ctx:['trauma','declining gcs','hemiparesis','midline shift','head injury'],
+   timeWindow:'Surgery within 4 hours of deterioration. SDH >10 mm or midline shift >5 mm → emergent craniotomy.',
+   imaging:'NCCT Head'},
+  {id:'ruptured_spleen', name:'Ruptured Spleen/Liver (Active Hemorrhage)', tier:3, weight:8,
+   keys:['ruptured spleen','splenic rupture','liver laceration','hepatic laceration','splenic laceration'],
+   ctx:['trauma','abdominal pain','fast positive','hypotension','lug pain','rug pain'],
+   timeWindow:'Angioembolization within 60–90 minutes of CT blush identification.',
+   imaging:'FAST → CT Abdomen'},
+  {id:'fournier', name:"Fournier's Gangrene", tier:3, weight:8,
+   keys:['fournier','fournier\'s gangrene','perineal gangrene','genital gangrene','scrotal gangrene'],
+   ctx:['crepitus','genital','perineal','sepsis','diabetic','necrotizing','spreading'],
+   timeWindow:'Mortality increases 3–9% per hour of delay. OR within 6 hours.',
+   imaging:'CT Pelvis/Perineum'},
+  {id:'necrotizing_fasciitis', name:'Necrotizing Fasciitis', tier:3, weight:8,
+   keys:['necrotizing fasciitis','nec fasc','flesh-eating','necrotizing infection'],
+   ctx:['rapidly spreading','crepitus','sepsis','pain out of proportion','erythema','soft tissue'],
+   timeWindow:'Fascia spreads 1–2 cm/hour. Mortality doubles if surgery >12 hours.',
+   imaging:'CT Affected Area'},
+  {id:'massive_pe', name:'Massive Pulmonary Embolism', tier:3, weight:8,
+   keys:['massive pe','massive pulmonary embolism','pe with hypotension','pe with shock'],
+   ctx:['syncope','hypotension','tachycardia','dyspnea','dvt'],
+   timeWindow:'Massive PE without treatment: ~80% mortality. Systemic thrombolysis within minutes of confirmation.',
+   imaging:'CTPA'},
+  {id:'aortic_b', name:'Aortic Dissection Type B (Complicated)', tier:3, weight:7,
+   keys:['type b dissection','complicated type b','stanford type b','aortic dissection type b'],
+   ctx:['back pain','interscapular','hypertension','pulse discrepancy'],
+   timeWindow:'Complications develop within 24–72 hours. TEVAR for complicated Type B.',
+   imaging:'CTA Chest'},
+  {id:'ruptured_viscus', name:'Ruptured Viscus / GI Perforation', tier:3, weight:8,
+   keys:['perforated viscus','bowel perforation','free air','perforated ulcer','gi perforation','free perforation'],
+   ctx:['sudden abdominal pain','board-like','absent bowel sounds','peritonitis'],
+   timeWindow:'Peritonitis worsens every hour. OR within 2–6 hours. Mortality doubles at >24-hour delay.',
+   imaging:'CT Abdomen'},
+  {id:'traumatic_aortic', name:'Traumatic Aortic Injury Grade II–III', tier:3, weight:8,
+   keys:['traumatic aortic','aortic injury','aortic transection','deceleration aortic'],
+   ctx:['high-velocity','deceleration','chest pain','mediastinal widening'],
+   timeWindow:'30% die within 6 hours without treatment. TEVAR within 24 hours.',
+   imaging:'CTA Chest'},
+  {id:'hsv_encephalitis', name:'HSV Encephalitis / CNS Infection', tier:3, weight:8,
+   keys:['encephalitis','hsv encephalitis','meningitis','cns infection','herpes encephalitis'],
+   ctx:['fever','confusion','seizure','altered mental status','temporal lobe','behavioral change'],
+   timeWindow:'IV acyclovir on clinical suspicion — do not wait for imaging. Mortality without acyclovir: 70–80%.',
+   imaging:'MRI Brain + Gadolinium'},
+  {id:'urosepsis', name:'Urosepsis with Obstructive Uropathy', tier:3, weight:7,
+   keys:['urosepsis','septic urinary','obstructive uropathy','urinary sepsis'],
+   ctx:['flank pain','fever','rigors','cva tenderness','sepsis','pyelonephritis'],
+   timeWindow:'Decompression within 6–12 hours. Mortality 20–40% delayed vs <5% with prompt drainage.',
+   imaging:'CT Abdomen (non-contrast)'},
+
+  // ── Tier 4: Moderate-High ──
+  {id:'appendicitis', name:'Appendicitis', tier:4, weight:6,
+   keys:['appendicitis','appendix','rlq ','right lower quadrant','mcburney','appendiceal'],
+   ctx:['nausea','vomiting','fever','anorexia','rebound','right side pain','abdominal pain'],
+   timeWindow:'Perforation risk ~20% at 24 hrs, ~65% at 48 hrs. CT target: 3–6 hrs from presentation.',
+   imaging:'CT Abdomen/Pelvis'},
+  {id:'bowel_obstruction', name:'Bowel Obstruction', tier:4, weight:6,
+   keys:['bowel obstruction','sbo','small bowel obstruction','large bowel obstruction','intestinal obstruction'],
+   ctx:['abdominal distension','vomiting','obstipation','bilious vomiting','no bowel movement'],
+   timeWindow:'Strangulation develops within 24–72 hours in complete obstruction.',
+   imaging:'CT Abdomen/Pelvis'},
+  {id:'nstemi', name:'NSTEMI / ACS (No ST Elevation)', tier:4, weight:5,
+   keys:['nstemi','acute coronary syndrome','acs','non-st elevation','non st elevation','nste-acs','unstable angina'],
+   ctx:['chest pain','troponin','cardiac','diaphoresis','elevated troponin','ischemia'],
+   timeWindow:'Risk stratification window is hours. HEART Pathway: early discharge vs admission decision.',
+   imaging:'CTPA / CT Coronary'},
+  {id:'submassive_pe', name:'Pulmonary Embolism (Submassive, Stable)', tier:4, weight:6,
+   keys:['pulmonary embolism','pe protocol','submassive pe','suspected pe','dvt and chest'],
+   ctx:['dyspnea','shortness of breath','tachycardia','pleuritic chest pain','hemoptysis','dvt','leg swelling'],
+   timeWindow:'RV dysfunction may progress. Catheter-directed therapy window is time-sensitive.',
+   imaging:'CTPA'},
+  {id:'mscc', name:'Spinal Cord Compression (MSCC)', tier:4, weight:7,
+   keys:['spinal cord compression','mscc','cord compression','myelopathy','cord syndrome'],
+   ctx:['malignancy','cancer','back pain','leg weakness','metastatic','oncology'],
+   timeWindow:'Ambulatory status at treatment is primary predictor of recovery.',
+   imaging:'MRI Spine'},
+  {id:'epidural_abscess', name:'Epidural/Psoas Abscess', tier:4, weight:6,
+   keys:['epidural abscess','psoas abscess','spinal abscess'],
+   ctx:['back pain','fever','weakness','radiculopathy','immunocompromised'],
+   timeWindow:'Can progress to motor deficit within hours; surgery if deficit develops.',
+   imaging:'MRI Spine'},
+  {id:'sigmoid_volvulus', name:'Sigmoid Volvulus', tier:4, weight:6,
+   keys:['sigmoid volvulus','volvulus'],
+   ctx:['abdominal distension','obstipation','constipation','abdominal pain'],
+   timeWindow:'Ischemia can develop within hours without decompression.',
+   imaging:'CT Abdomen'},
+  {id:'carotid_dissection', name:'Carotid/Vertebral Artery Dissection', tier:4, weight:7,
+   keys:['carotid dissection','vertebral dissection','arterial dissection','cervical artery dissection'],
+   ctx:['neck pain','headache','horner','tia','transient ischemic','focal neuro'],
+   timeWindow:'Embolic stroke risk highest in first 24–72 hours.',
+   imaging:'CTA Head/Neck'},
+
+  // ── Tier 5: Moderate ──
+  {id:'pneumonia', name:'Pneumonia', tier:5, weight:3,
+   keys:['pneumonia','pulmonary infiltrate','lower respiratory infection','lobar pneumonia','community acquired pneumonia'],
+   ctx:['fever','cough','dyspnea','shortness of breath','productive cough','consolidation'],
+   timeWindow:'Brief delay unlikely to change outcome without deterioration.',
+   imaging:'CT Chest / CXR'},
+  {id:'pancreatitis', name:'Pancreatitis', tier:5, weight:3,
+   keys:['pancreatitis','pancreatic inflammation'],
+   ctx:['epigastric pain','abdominal pain','nausea','vomiting','lipase'],
+   timeWindow:'CT indicated after 48–72 hours per guidelines unless complications suspected.',
+   imaging:'CT Abdomen'},
+  {id:'diverticulitis', name:'Diverticulitis', tier:5, weight:3,
+   keys:['diverticulitis','diverticular disease'],
+   ctx:['llq pain','left lower quadrant','abdominal pain','fever','left-sided pain'],
+   timeWindow:'Brief delay unlikely to change outcome in uncomplicated cases.',
+   imaging:'CT Abdomen/Pelvis'},
+  {id:'cholangitis_mild', name:'Cholangitis Grade I (Mild)', tier:5, weight:3,
+   keys:['cholangitis grade 1','cholangitis grade i','mild cholangitis','early cholangitis'],
+   ctx:['ruq pain','jaundice','fever','biliary'],
+   timeWindow:'ERCP within 72 hours per TG18 guidelines.',
+   imaging:'RUQ US / MRCP'},
+
+  // ── Catch-all low-tier ──
+  {id:'chest_pain', name:'Chest Pain (Undifferentiated)', tier:5, weight:1,
+   keys:['chest pain','chest tightness','chest pressure','chest discomfort','chest heaviness'],
+   ctx:['cardiac','dyspnea','diaphoresis','pleuritic','shortness of breath'],
+   timeWindow:'Requires further risk stratification (HEART Pathway, troponins, ECG).',
+   imaging:'CXR / CT per workup'},
+  {id:'headache', name:'Headache (Undifferentiated)', tier:5, weight:1,
+   keys:['headache','head pain','head ache'],
+   ctx:['nausea','vomiting','photophobia','sudden onset','severe','worst'],
+   timeWindow:'Any thunderclap or worst-ever headache requires immediate CT to rule out SAH.',
+   imaging:'CT Head (if high-risk features)'},
+  {id:'abdominal_pain', name:'Abdominal Pain (Undifferentiated)', tier:5, weight:1,
+   keys:['abdominal pain','stomach pain','belly pain','ab pain'],
+   ctx:['nausea','vomiting','fever','tenderness','cramping'],
+   timeWindow:'Requires further characterization.',
+   imaging:'CT Abdomen per clinical evaluation'},
+  {id:'back_pain', name:'Back Pain (Undifferentiated)', tier:5, weight:1,
+   keys:['back pain','lower back pain','low back pain','lumbar pain'],
+   ctx:['radiculopathy','numbness','weakness','trauma'],
+   timeWindow:'Requires clinical evaluation for red flags (CES, cord compression).',
+   imaging:'MRI Spine if red flags present'},
+];
+
+// ════════════════════════════════════════════════════
+//  IMAGING MODALITY SCORING (C3)
+// ════════════════════════════════════════════════════
+
+function getImagingScore(img, condId) {
+  if (!img) return {score:0, label:'None specified'};
+  const neuroHeadConds = ['stroke_sx','ischemic_stroke','ich','sah','epidural_hematoma','orbital_compartment'];
+  const aorticConds = ['aortic_dissection_a','aortic_b','traumatic_aortic','massive_hemothorax'];
+  const vascAbConds = ['ruptured_aaa','mesenteric_ischemia'];
+  const spineConds = ['cauda_equina','mscc','epidural_abscess'];
+  const torsionConds = ['testicular_torsion'];
+
+  if (img.ctHead) {
+    const lbl = neuroHeadConds.includes(condId) ? 'CT Head (neuro/stroke protocol)' : 'CT Head';
+    return {score:15, label:lbl};
+  }
+  if (img.ctpa) return {score:12, label:'CTPA (PE protocol)'};
+  if (img.mriGad || img.mri) {
+    if (spineConds.includes(condId)) return {score:12, label:'MRI Spine with Gadolinium'};
+    return {score:12, label:'MRI Brain'+(img.mriGad ? ' with Gadolinium' : '')};
+  }
+  if (img.us) {
+    if (torsionConds.includes(condId)) return {score:12, label:'Doppler US (torsion protocol)'};
+    return {score:6, label:'Ultrasound'};
+  }
+  if (img.ctChest) {
+    if (aorticConds.includes(condId)) return {score:12, label:'CTA Chest (aortic/vascular)'};
+    return {score:8, label:'CT Chest'};
+  }
+  if (img.ctAb) {
+    if (vascAbConds.includes(condId)) return {score:12, label:'CTA Abdomen (vascular emergency)'};
+    return {score:8, label:'CT Abdomen/Pelvis'};
+  }
+  if (img.xr) return {score:2, label:'X-Ray'};
+  return {score:0, label:'None specified'};
+}
+
+// ════════════════════════════════════════════════════
+//  CHIEF COMPLAINT → CONDITION MAPPING
+// ════════════════════════════════════════════════════
+
+function mapComplaint(text) {
+  if (!text || text.trim().length < 2)
+    return {id:'unspecified', name:'Complaint Not Documented', tier:6, confidence:'low', timeWindow:'Cannot assess urgency without clinical information.'};
+
+  const t = text.toLowerCase();
+  let best = null, bestScore = 0;
+
+  for (const cond of CONDITIONS) {
+    let score = 0, keyHit = false;
+    for (const key of cond.keys) {
+      if (t.includes(key)) { score += cond.weight * 3; keyHit = true; }
+    }
+    if (keyHit) {
+      for (const ctx of cond.ctx) {
+        if (t.includes(ctx)) score += cond.weight;
+      }
+      if (score > bestScore) { bestScore = score; best = cond; }
+    }
+  }
+
+  if (!best) return {id:'unspecified', name:'Condition Undetermined (Vague Complaint)', tier:6, confidence:'low',
+    timeWindow:'Complaint too vague to assess urgency. Clarify presenting symptoms.'};
+
+  const thr4 = best.weight * 4, thr2 = best.weight * 2;
+  const confidence = bestScore >= thr4 ? 'high' : bestScore >= thr2 ? 'moderate' : 'low';
+  return {...best, confidence};
+}
+
+// ════════════════════════════════════════════════════
+//  C4: VITAL SIGN DANGER ZONE (ESI Handbook Ch. 6)
+// ════════════════════════════════════════════════════
+
+function calcC4(v, age) {
+  if (!v) return {score:0, flags:[], capped:false};
+  const {hr, rr, spo2, sbp, tempF} = v;
+  let raw = 0;
+  const flags = [];
+
+  if (spo2 != null) {
+    if (spo2 < 90)      { raw += 20; flags.push('SpO₂ <90% — ESI 1 criterion'); }
+    else if (spo2 < 92) { raw += 15; flags.push('SpO₂ <92% — danger zone (uptriage ESI 2)'); }
+  }
+  if (sbp != null && sbp < 90) { raw += 20; flags.push('SBP <90 mmHg — hemodynamic instability'); }
+
+  if (hr != null) {
+    const a = age ?? 99;
+    if (a < 3/12)    { if (hr > 180) { raw += 10; flags.push('HR >180 (infant danger zone)'); } }
+    else if (a < 3)  { if (hr > 160) { raw += 10; flags.push('HR >160 (child danger zone)'); } }
+    else if (a < 8)  { if (hr > 140) { raw += 10; flags.push('HR >140 (child danger zone)'); } }
+    else {
+      if (hr > 120)      { raw += 15; flags.push('HR >120 — severe tachycardia'); }
+      else if (hr > 100) { raw += 10; flags.push('HR >100 — danger zone'); }
+    }
+  }
+  if (rr != null) {
+    if (rr > 30)      { raw += 10; flags.push('RR >30 — respiratory failure threshold'); }
+    else if (rr > 20) { raw += 5;  flags.push('RR >20 — danger zone'); }
+  }
+  if (tempF != null) {
+    const tc = (tempF - 32) / 1.8;
+    if (tc > 39.5)     { raw += 8; flags.push('Temp >39.5°C — high fever/sepsis risk'); }
+    else if (tc > 38.5){ raw += 5; flags.push('Temp >38.5°C — fever'); }
+  }
+  // Cushing's Triad
+  if (hr != null && sbp != null && hr < 60 && sbp > 160) {
+    raw += 25; flags.push("Cushing's Triad — impending herniation");
+  }
+
+  const capped = raw > 35;
+  return {score: Math.min(raw, 35), rawScore: raw, flags, capped};
+}
+
+// ════════════════════════════════════════════════════
+//  FULL SCORE CALCULATOR
+// ════════════════════════════════════════════════════
+
+function calcScore(pt) {
+  const esi = pt.esiLevel, v = pt.vitals || {}, age = pt.age;
+  const text = (pt.chiefComplaints || []).join('. ');
+  const condition = mapComplaint(text);
+  const img = pt.imaging || {};
+
+  const c1 = esi ? (ESI_BASE[esi] || 0) : 0;
+  const c2 = TIER_SCORE[condition.tier] || 0;
+  const imgRes = getImagingScore(img, condition.id);
+  const c3 = imgRes.score;
+  const c4Res = calcC4(v, age);
+  const c4 = c4Res.score;
+
+  let c5 = 0, c5Lbl = '—';
+  if (v.pain != null) {
+    if (v.pain >= 9)      { c5 = 8; c5Lbl = `${v.pain}/10 — Severe`; }
+    else if (v.pain >= 7) { c5 = 5; c5Lbl = `${v.pain}/10 — Severe`; }
+    else if (v.pain >= 5) { c5 = 3; c5Lbl = `${v.pain}/10 — Moderate`; }
+    else                  { c5 = 0; c5Lbl = `${v.pain}/10 — Mild`; }
+  }
+
+  const c6 = pt.arrivedByAmbulance ? 5 : 0;
+
+  let c7 = 0, c7Lbl = '—';
+  if (age != null) {
+    if (age <= 28/365)    { c7 = 10; c7Lbl = 'Neonatal (≤28 days)'; }
+    else if (age <= 0.25) { c7 = 8;  c7Lbl = 'Infant (1–3 months)'; }
+    else if (age <= 3)    { c7 = 5;  c7Lbl = 'Young child (3 mo–3 yr)'; }
+    else if (age <= 12)   { c7 = 3;  c7Lbl = 'Child (3–12 years)'; }
+    else if (age <= 64)   { c7 = 0;  c7Lbl = 'Adult (13–64)'; }
+    else if (age <= 79)   { c7 = 5;  c7Lbl = 'Elderly (65–79)'; }
+    else                  { c7 = 8;  c7Lbl = 'Very elderly (≥80)'; }
+  }
+
+  const total = c1 + c2 + c3 + c4 + c5 + c6 + c7;
+
+  // Data completeness
+  const hasVitals = v.hr != null || v.rr != null || v.spo2 != null;
+  const hasESI = esi != null;
+  const vagueCompl = condition.id === 'unspecified';
+  let completeness = 'complete', confidence = condition.confidence || 'high';
+  if (!hasESI && !hasVitals && vagueCompl) { completeness = 'incomplete'; confidence = 'low'; }
+  else if (!hasESI || !hasVitals || vagueCompl) { completeness = 'partial'; confidence = confidence === 'high' ? 'moderate' : confidence; }
+
+  // Layer 2 vital triad trigger
+  const vitalTriad = v.spo2 != null && v.hr != null && v.rr != null && v.spo2 < 92 && v.hr > 100 && v.rr > 20;
+
+  return { total, c1, c2, c3, c4, c5, c6, c7,
+    condition, imgLabel: imgRes.label, c4Flags: c4Res.flags, c4Capped: c4Res.capped,
+    c5Lbl, c7Lbl, completeness, confidence, esiLabel: esi ? ESI_LABELS[esi] : 'Unknown', vitalTriad };
+}
+
+// ════════════════════════════════════════════════════
+//  QUEUE RANKING
+// ════════════════════════════════════════════════════
+
+function rankPatients(pts) {
+  const scored = pts.map(p => ({...p, _s: calcScore(p)}));
+  scored.sort((a, b) => b._s.total - a._s.total);
+
+  const pairs = [];
+  // Adjacent score tiebreakers (≤10 pts)
+  for (let i = 0; i < scored.length - 1; i++) {
+    const gap = Math.abs(scored[i]._s.total - scored[i+1]._s.total);
+    if (gap <= 10) pairs.push({type:'tie', gap, idx1:i, idx2:i+1, p1:scored[i], p2:scored[i+1]});
+  }
+  // Vital triad trigger
+  for (let i = 0; i < scored.length; i++) {
+    if (scored[i]._s.vitalTriad) {
+      const already = pairs.some(p => p.idx1===i || p.idx2===i);
+      if (!already && i < scored.length-1) {
+        const gap = Math.abs(scored[i]._s.total - scored[i+1]._s.total);
+        if (gap <= 20) pairs.push({type:'triad', gap, idx1:i, idx2:i+1, p1:scored[i], p2:scored[i+1]});
+      }
+    }
+  }
+  // Incomplete data
+  for (let i = 0; i < scored.length; i++) {
+    if (scored[i]._s.completeness !== 'complete') {
+      const already = pairs.some(p => p.idx1===i || p.idx2===i);
+      if (!already) pairs.push({type:'incomplete', idx1:i, idx2:-1, p1:scored[i], p2:null});
+    }
+  }
+
+  return {ranked: scored, pairs};
+}
+
+// ════════════════════════════════════════════════════
+//  APP STATE
+// ════════════════════════════════════════════════════
+
+let patients = [];
+let posAnalysis = {};      // ptId → {text} or {error}
+let analysisPending = {};  // ptId → true (in flight)
+let physNotes = {};        // ptId → string
+let rankedOrder = [];      // AI queue in rank order (array of pt objects)
+let expandedCards = new Set(); // ptIds currently expanded
+let apiKey = '';
+
+// ════════════════════════════════════════════════════
+//  LAYER 2: PER-CARD POSITION ANALYSIS
+// ════════════════════════════════════════════════════
+
+function ptInfo(p) {
+  const v = p.vitals || {};
+  const imgs = [];
+  const im = p.imaging || {};
+  if (im.ctHead) imgs.push('CT Head');
+  if (im.ctpa) imgs.push('CTPA');
+  if (im.ctChest) imgs.push('CT Chest');
+  if (im.ctAb) imgs.push('CT Abdomen/Pelvis');
+  if (im.mri || im.mriGad) imgs.push('MRI'+(im.mriGad?' +Gad':''));
+  if (im.us) imgs.push('Ultrasound/Doppler');
+  if (im.xr) imgs.push('X-Ray');
+  return `ID: ${p.id} | ESI: ${p.esiLevel??'Unknown'} | Age: ${p.age??'Unknown'}${p.sex?p.sex:''} | Score: ${p._s.total}
+Chief Complaint: "${(p.chiefComplaints||[]).join('; ')}"
+Condition (Layer 1): ${p._s.condition?.name??'Undetermined'} (Tier ${p._s.condition?.tier??'?'})
+Imaging: ${imgs.join(', ')||'None'}
+Vitals: HR ${v.hr??'?'} | RR ${v.rr??'?'} | BP ${v.sbp??'?'}/${v.dbp??'?'} | SpO₂ ${v.spo2??'?'}% | Temp ${v.tempF??'?'}°F | Pain ${v.pain??'?'}/10
+Ambulance: ${p.arrivedByAmbulance?'Yes':'No'}`;
+}
+
+function buildPositionPrompt(pt, above, below, rank, total) {
+  const aboveStr = above
+    ? `=== RANK ${rank-1} (DIRECTLY ABOVE IN QUEUE) ===\n${ptInfo(above)}`
+    : '=== (This patient is #1 — no patient above) ===';
+  const belowStr = below
+    ? `=== RANK ${rank+1} (DIRECTLY BELOW IN QUEUE) ===\n${ptInfo(below)}`
+    : '=== (This patient is last in queue — no patient below) ===';
+  return `This patient is ranked #${rank} of ${total} in the ED imaging queue at Nebraska Medicine.
+
+${aboveStr}
+
+=== RANK ${rank} (THIS PATIENT) ===
+${ptInfo(pt)}
+
+${belowStr}
+
+In 3–5 sentences: Explain why this position is clinically appropriate. Compare their time-sensitivity tier, urgency score, and vital signs to the adjacent patients. Note any time windows closing or asymmetric delay consequences that justify this ranking.`;
+}
+
+async function generateAnalysis(id) {
+  if (analysisPending[id] || !apiKey) return;
+  analysisPending[id] = true;
+
+  const safeId = id.replace(/\W/g,'_');
+  const posDiv = document.getElementById('pos-' + safeId);
+  if (posDiv) posDiv.innerHTML = '<div class="pos-result"><div class="l2-loading"><div class="spinner"></div>Generating AI position analysis…</div></div>';
+
+  const idx = rankedOrder.findIndex(p => p.id === id);
+  if (idx < 0) { delete analysisPending[id]; return; }
+  const pt = rankedOrder[idx];
+  const above = idx > 0 ? rankedOrder[idx-1] : null;
+  const below = idx < rankedOrder.length-1 ? rankedOrder[idx+1] : null;
+  const rank = idx + 1;
+  const total = rankedOrder.length;
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        max_tokens: 500,
+        messages: [
+          {role:'system', content:'You are a clinical AI for an ED imaging queue prioritization tool at Nebraska Medicine. Provide concise, evidence-based reasoning about a patient\'s imaging priority position. 3–5 sentences. Be direct and specific.'},
+          {role:'user', content: buildPositionPrompt(pt, above, below, rank, total)}
+        ]
+      })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'API error'); }
+    const data = await res.json();
+    posAnalysis[id] = {text: data.choices[0].message.content};
+  } catch(e) {
+    posAnalysis[id] = {error: e.message};
+  }
+  delete analysisPending[id];
+
+  if (posDiv) {
+    if (posAnalysis[id]?.error) {
+      posDiv.innerHTML = '<div style="color:var(--danger);font-size:11px;margin-bottom:6px">Error: ' + escHtml(posAnalysis[id].error) + '</div>'
+        + '<button class="pos-btn" onclick="generateAnalysis(\'' + id + '\');event.stopPropagation()">Retry</button>';
+    } else {
+      const txt = (posAnalysis[id]?.text || '—').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
+      posDiv.innerHTML = '<div class="pos-result"><p>' + txt + '</p></div>';
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════
+//  RENDERING HELPERS
+// ════════════════════════════════════════════════════
+
+function scoreClass(n) {
+  if (n >= 120) return 'crit';
+  if (n >= 90)  return 'high';
+  if (n >= 60)  return 'modhigh';
+  return 'mod';
+}
+function tierClass(t) { return 'tier' + Math.min(t, 6); }
+function esiClass(e) { return e ? 'esi-' + e : 'esi-unk'; }
+function confClass(c) { return {high:'conf-high',moderate:'conf-mod',low:'conf-low'}[c] || 'conf-mod'; }
+function confLabel(c) {
+  if (c==='high') return '🟢 HIGH CONFIDENCE';
+  if (c==='moderate') return '🟡 MODERATE CONFIDENCE';
+  return '🔴 LOW CONFIDENCE — Re-triage required';
+}
+
+function condLabel(cond) {
+  if (!cond || cond.id === 'unspecified') return 'Condition Undetermined';
+  const pfx = cond.tier <= 2 ? 'Suspected' : 'Possible';
+  return pfx + ': ' + cond.name;
+}
+
+function imagingText(img) {
+  if (!img) return 'None';
+  const a = [];
+  if (img.ctHead) a.push('CT Head');
+  if (img.ctpa) a.push('CTPA');
+  if (img.ctChest) a.push('CT Chest');
+  if (img.ctAb) a.push('CT Ab/Pelvis');
+  if (img.mri || img.mriGad) a.push('MRI' + (img.mriGad ? '+Gad' : ''));
+  if (img.us) a.push('Doppler US');
+  if (img.xr) a.push('X-Ray');
+  if (img.ctContrast) a.push('[IV Contrast]');
+  return a.length ? a.join(', ') : 'None specified';
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderBreakdown(s) {
+  const rows = [
+    ['C1 — ESI Level', s.esiLabel, s.c1],
+    ['C2 — Condition Tier', condLabel(s.condition), s.c2],
+    ['C3 — Imaging Modality', s.imgLabel || 'None', s.c3],
+    ['C4 — Vital Signs', s.c4Flags?.length ? s.c4Flags.join('; ') : 'No danger zone findings', s.c4],
+    ['C5 — Pain Scale', s.c5Lbl || '—', s.c5],
+    ['C6 — Arrival Mode', s.c6 > 0 ? 'Ambulance (+5)' : 'Walk-in (±0)', s.c6],
+    ['C7 — Age Risk', s.c7Lbl || '—', s.c7],
+  ];
+  return '<table class="score-tbl">'
+    + '<tr style="font-size:9px;color:var(--text-dim)"><td>COMPONENT</td><td>VALUE</td><td style="text-align:right">PTS</td></tr>'
+    + rows.map(([c,v,p]) => '<tr><td>' + c + '</td><td>' + v + '</td><td style="color:' + (p > 0 ? 'var(--text)' : 'var(--text-dim)') + '">+' + p + '</td></tr>').join('')
+    + '<tr class="trow-total"><td colspan="2">URGENCY</td><td style="font-size:14px;text-align:right">' + s.total + '</td></tr>'
+    + '</table>'
+    + (s.c4Capped ? '<div style="font-size:9px;color:var(--text-dim);margin-top:3px">C4 capped at 35</div>' : '');
+}
+
+function renderFCFSCard(pt, rank) {
+  const s = pt._s;
+  const tc = tierClass(s.condition?.tier || 6);
+  return '<div class="fcfs-card ' + tc + '">'
+    + '<div class="rank-sm">' + rank + '</div>'
+    + '<div style="flex:1;min-width:0;overflow:hidden">'
+      + '<div style="font-size:11px;font-weight:700;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(pt.id) + '</div>'
+      + '<div style="font-size:9px;color:var(--text-dim)">' + (pt.arrivalTime || '—') + '</div>'
+    + '</div>'
+    + '<span class="esi-badge ' + esiClass(pt.esiLevel) + '" style="font-size:9px;padding:1px 5px">ESI' + (pt.esiLevel || '?') + '</span>'
+    + '</div>';
+}
+
+function renderAICard(pt, rank, total, isTie) {
+  const s = pt._s;
+  const tc = tierClass(s.condition?.tier || 6);
+  const isExp = expandedCards.has(pt.id);
+  const safeId = pt.id.replace(/\W/g,'_');
+  const note = escHtml(physNotes[pt.id] || '');
+  const v = pt.vitals || {};
+
+  // Vitals grid
+  function vitalCell(lbl, val, danger) {
+    return '<div class="vital-cell"><div class="vital-lbl">' + lbl + '</div>'
+      + '<div class="vital-val" style="color:' + (val !== '—' && danger ? 'var(--warning)' : 'var(--text)') + '">' + val + '</div></div>';
+  }
+  const vitalsHtml = '<div class="vitals-grid">'
+    + vitalCell('HR', v.hr != null ? v.hr + ' bpm' : '—', v.hr > 100)
+    + vitalCell('BP', v.sbp != null ? v.sbp + '/' + (v.dbp != null ? v.dbp : '?') : '—', v.sbp < 90 || v.sbp > 160)
+    + vitalCell('SpO₂', v.spo2 != null ? v.spo2 + '%' : '—', v.spo2 < 92)
+    + vitalCell('RR', v.rr != null ? v.rr + '/min' : '—', v.rr > 20)
+    + vitalCell('Temp', v.tempF != null ? v.tempF + '°F' : '—', v.tempF > 101.3)
+    + vitalCell('Pain', v.pain != null ? v.pain + '/10' : '—', v.pain >= 7)
+    + '</div>';
+
+  // Position analysis section
+  const above = rank > 1 ? rankedOrder[rank-2] : null;
+  const below = rank < total ? rankedOrder[rank] : null;
+  let analysisHtml;
+  if (!apiKey) {
+    analysisHtml = '<div style="font-size:11px;color:var(--text-dim)">Enter an OpenAI API key above to enable AI position analysis.</div>';
+  } else if (analysisPending[pt.id]) {
+    analysisHtml = '<div class="pos-result"><div class="l2-loading"><div class="spinner"></div>Generating AI position analysis…</div></div>';
+  } else if (posAnalysis[pt.id]?.error) {
+    analysisHtml = '<div style="color:var(--danger);font-size:11px;margin-bottom:6px">Error: ' + escHtml(posAnalysis[pt.id].error) + '</div>'
+      + '<button class="pos-btn" onclick="generateAnalysis(\'' + pt.id + '\');event.stopPropagation()">Retry</button>';
+  } else if (posAnalysis[pt.id]?.text) {
+    const txt = posAnalysis[pt.id].text.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
+    analysisHtml = '<div class="pos-result"><p>' + txt + '</p></div>';
+  } else {
+    const aboveLbl = above ? 'Rank ' + (rank-1) + ' (' + above.id + ')' : 'none above';
+    const belowLbl = below ? 'Rank ' + (rank+1) + ' (' + below.id + ')' : 'none below';
+    analysisHtml = '<div style="font-size:11px;color:var(--text-dim);margin-bottom:6px">'
+      + 'Compares position #' + rank + ' vs. ' + aboveLbl + ' &amp; ' + belowLbl
+      + '</div>'
+      + '<button class="pos-btn" onclick="generateAnalysis(\'' + pt.id + '\');event.stopPropagation()">Generate Position Analysis</button>';
+  }
+
+  return '<div class="ai-card ' + tc + (isTie ? ' is-tie' : '') + '" id="aic-' + safeId + '">'
+    + (isTie ? '<div class="tie-banner">Layer 2 Analysis Recommended</div>' : '')
+    + '<div class="ai-card-header" onclick="toggleCard(\'' + pt.id + '\')">'
+      + '<div class="rank-circle">' + rank + '</div>'
+      + '<div style="flex:1;min-width:0">'
+        + '<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">'
+          + '<span class="patient-id">' + escHtml(pt.id) + '</span>'
+          + '<span class="esi-badge ' + esiClass(pt.esiLevel) + '">ESI ' + (pt.esiLevel || '?') + '</span>'
+        + '</div>'
+        + '<div class="cond-name">' + condLabel(s.condition) + '</div>'
+      + '</div>'
+      + '<div style="text-align:right;flex-shrink:0">'
+        + '<div class="score-val ' + scoreClass(s.total) + '">' + s.total + '</div>'
+        + '<div class="score-lbl">urgency</div>'
+      + '</div>'
+      + '<span class="chevron" style="color:var(--text-dim);font-size:13px;flex-shrink:0;margin-left:6px">' + (isExp ? '▴' : '▾') + '</span>'
+    + '</div>'
+    + '<div class="ai-card-body" id="body-' + safeId + '" style="' + (isExp ? '' : 'display:none') + '">'
+      + '<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">'
+        + (pt.age != null ? pt.age : '?') + (pt.sex || '') + ' · Arrived ' + (pt.arrivalTime || '—')
+        + ' · ' + (pt.arrivedByAmbulance ? 'Ambulance' : 'Walk-in')
+        + ' · ' + imagingText(pt.imaging)
+      + '</div>'
+      + '<div style="font-size:12px;color:var(--text-muted);line-height:1.55;margin-bottom:8px">'
+        + '<strong style="color:var(--text)">Complaint:</strong> '
+        + escHtml((pt.chiefComplaints || []).join('; ') || 'Not documented')
+      + '</div>'
+      + '<span class="conf-badge ' + confClass(s.confidence) + '">' + confLabel(s.confidence) + '</span>'
+      + '<div class="sec-lbl" style="margin-top:12px">Vital Signs</div>'
+      + vitalsHtml
+      + '<div class="sec-lbl">Urgency Breakdown (C1–C7)</div>'
+      + renderBreakdown(s)
+      + '<div class="sec-lbl" style="margin-top:16px">Physician Notes — Imaging Request</div>'
+      + '<textarea class="phys-notes" placeholder="Add imaging request context, clinical history, or observations for the radiologist…"'
+        + ' onclick="event.stopPropagation()"'
+        + ' oninput="saveNote(\'' + pt.id + '\',this.value)">' + note + '</textarea>'
+      + '<div class="sec-lbl blue" style="margin-top:16px">AI Position Analysis</div>'
+      + '<div id="pos-' + safeId + '">' + analysisHtml + '</div>'
+    + '</div>'
+  + '</div>';
+}
+
+function toggleCard(id) {
+  const isNowExp = !expandedCards.has(id);
+  if (isNowExp) expandedCards.add(id); else expandedCards.delete(id);
+  const safeId = id.replace(/\W/g,'_');
+  const body = document.getElementById('body-' + safeId);
+  const card = document.getElementById('aic-' + safeId);
+  if (body) body.style.display = isNowExp ? 'block' : 'none';
+  if (card) {
+    const chev = card.querySelector('.chevron');
+    if (chev) chev.textContent = isNowExp ? '▴' : '▾';
+  }
+}
+
+function saveNote(id, val) {
+  physNotes[id] = val;
+}
+
+// ════════════════════════════════════════════════════
+//  MAIN RENDER
+// ════════════════════════════════════════════════════
+
+function renderAll() {
+  const fcfsEl = document.getElementById('fcfsQueue');
+  const aiEl = document.getElementById('aiQueue');
+  const statsEl = document.getElementById('statsBar');
+
+  if (!patients.length) {
+    const empty = '<div class="empty-state"><h3>No patients in queue</h3><p>Add a patient or load the demo scenario.</p></div>';
+    fcfsEl.innerHTML = aiEl.innerHTML = empty;
+    statsEl.innerHTML = '';
+    return;
+  }
+
+  const {ranked, pairs} = rankPatients(patients);
+  const fcfs = [...ranked].sort((a,b) => (a.arrivalTimestamp||0) - (b.arrivalTimestamp||0));
+
+  const tieIds = new Set();
+  pairs.filter(p => p.type==='tie' || p.type==='triad').forEach(p => {
+    tieIds.add(p.p1.id);
+    if (p.p2) tieIds.add(p.p2.id);
+  });
+
+  rankedOrder = [...ranked];
+
+  fcfsEl.innerHTML = fcfs.map((p,i) => renderFCFSCard(p, i+1)).join('');
+  aiEl.innerHTML = rankedOrder.map((p,i) => renderAICard(p, i+1, rankedOrder.length, tieIds.has(p.id))).join('');
+
+  const tier1 = ranked.filter(p => p._s.condition?.tier <= 1).length;
+  const tier2 = ranked.filter(p => p._s.condition?.tier === 2).length;
+  const avg = Math.round(ranked.reduce((s,p) => s + p._s.total, 0) / ranked.length);
+  statsEl.innerHTML = '<span>Patients: <strong>' + patients.length + '</strong></span>'
+    + '<span style="color:var(--esi1)">Tier 1: <strong>' + tier1 + '</strong></span>'
+    + '<span style="color:var(--esi2)">Tier 2: <strong>' + tier2 + '</strong></span>'
+    + '<span>Avg Urgency: <strong>' + avg + '</strong></span>'
+    + (tieIds.size ? '<span style="color:var(--accent)">Layer 2 recommended: ' + tieIds.size + '</span>' : '');
+}
+
+// ════════════════════════════════════════════════════
+//  DEMO PATIENTS
+// ════════════════════════════════════════════════════
+
+function ts(t) {
+  const d = new Date(); const [h,m] = t.split(':').map(Number);
+  return new Date(d.getFullYear(),d.getMonth(),d.getDate(),h,m,0).getTime();
+}
+
+const DEMO = [
+  // PT-003 arrives FIRST (appendicitis — monopolizes top FCFS spot despite moderate urgency)
+  { id:'PT-003', arrivalTime:'14:05', arrivalTimestamp:null, age:29, sex:'F', esiLevel:3,
+    chiefComplaints:['Right lower quadrant pain, worsening since yesterday, nausea, loss of appetite, mild fever'],
+    arrivedByAmbulance:false,
+    vitals:{tempF:100.8, hr:103, rr:17, sbp:116, dbp:74, spo2:99, pain:7},
+    imaging:{ctHead:false,ctChest:false,ctAb:true,ctpa:false,ctContrast:true,mri:false,mriGad:false,us:false,xr:false}},
+  // PT-004 (chest pain ACS workup — tiebreaker with PT-005)
+  { id:'PT-004', arrivalTime:'14:18', arrivalTimestamp:null, age:57, sex:'M', esiLevel:3,
+    chiefComplaints:['Chest pressure with diaphoresis and shortness of breath, onset 2 hours, radiating to left arm, troponin mildly elevated, no ST elevation on ECG'],
+    arrivedByAmbulance:false,
+    vitals:{tempF:98.4, hr:90, rr:16, sbp:128, dbp:82, spo2:97, pain:5},
+    imaging:{ctHead:false,ctChest:false,ctAb:false,ctpa:true,ctContrast:false,mri:false,mriGad:false,us:false,xr:false}},
+  // PT-005 (sudden headache — tiebreaker with PT-004; possible SAH not captured by Layer 1)
+  { id:'PT-005', arrivalTime:'14:22', arrivalTimestamp:null, age:44, sex:'F', esiLevel:3,
+    chiefComplaints:['Severe headache with sudden onset 2 hours ago, associated nausea, no focal neurological deficits, no prior history of similar headache'],
+    arrivedByAmbulance:false,
+    vitals:{tempF:98.7, hr:80, rr:14, sbp:148, dbp:90, spo2:99, pain:8},
+    imaging:{ctHead:true,ctChest:false,ctAb:false,ctpa:false,ctContrast:false,mri:false,mriGad:false,us:false,xr:false}},
+  // PT-002 (suspected PE — arrives 4th despite being 2nd most urgent)
+  { id:'PT-002', arrivalTime:'14:38', arrivalTimestamp:null, age:56, sex:'M', esiLevel:3,
+    chiefComplaints:['Sudden shortness of breath and right-sided chest pain worse with breathing, right leg swelling for 5 days — pulmonary embolism work-up'],
+    arrivedByAmbulance:false,
+    vitals:{tempF:98.6, hr:106, rr:22, sbp:122, dbp:78, spo2:95, pain:4},
+    imaging:{ctHead:false,ctChest:false,ctAb:false,ctpa:true,ctContrast:false,mri:false,mriGad:false,us:false,xr:false}},
+  // PT-006 (incomplete data — Layer 2 incomplete trigger)
+  { id:'PT-006', arrivalTime:'14:52', arrivalTimestamp:null, age:null, sex:null, esiLevel:null,
+    chiefComplaints:['Pain'],
+    arrivedByAmbulance:false,
+    vitals:{tempF:null,hr:null,rr:null,sbp:null,dbp:null,spo2:null,pain:null},
+    imaging:{ctHead:false,ctChest:false,ctAb:true,ctpa:false,ctContrast:false,mri:false,mriGad:false,us:false,xr:false}},
+  // PT-001 arrives LAST (stroke — should be #1 in AI queue but 6th in FCFS)
+  { id:'PT-001', arrivalTime:'15:04', arrivalTimestamp:null, age:71, sex:'F', esiLevel:2,
+    chiefComplaints:['Sudden right arm weakness and facial droop, onset 55 minutes ago, slurred speech'],
+    arrivedByAmbulance:true,
+    vitals:{tempF:98.6, hr:84, rr:16, sbp:172, dbp:98, spo2:97, pain:1},
+    imaging:{ctHead:true,ctChest:false,ctAb:false,ctpa:false,ctContrast:false,mri:false,mriGad:false,us:false,xr:false}},
+];
+
+function loadDemo() {
+  posAnalysis = {}; analysisPending = {}; physNotes = {}; expandedCards = new Set();
+  patients = DEMO.map(p => ({...p, arrivalTimestamp: ts(p.arrivalTime)}));
+  renderAll();
+}
+
+function clearAll() {
+  patients = []; posAnalysis = {}; analysisPending = {}; physNotes = {}; expandedCards = new Set(); rankedOrder = [];
+  renderAll();
+}
+
+// ════════════════════════════════════════════════════
+//  ADD PATIENT FORM
+// ════════════════════════════════════════════════════
+
+function openPanel() {
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('addPanel').classList.add('open');
+  const n = patients.length + 1;
+  document.getElementById('f_id').value = `PT-${String(n).padStart(3,'0')}`;
+  const now = new Date();
+  document.getElementById('f_arr').value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
+function closePanel() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('addPanel').classList.remove('open');
+}
+
+function g(id) { return document.getElementById(id); }
+function gv(id) { return g(id).value; }
+
+function submitPatient() {
+  const arr = gv('f_arr');
+  const age = gv('f_age') !== '' ? parseFloat(gv('f_age')) : null;
+  const spo2v = parseFloat(gv('f_spo2'));
+  const hrv = parseInt(gv('f_hr')); const rrv = parseInt(gv('f_rr'));
+  const sbpv = parseInt(gv('f_sbp')); const dbpv = parseInt(gv('f_dbp'));
+  const painv = gv('f_pain') !== '' ? parseInt(gv('f_pain')) : null;
+  const tempv = gv('f_temp') !== '' ? parseFloat(gv('f_temp')) : null;
+
+  patients.push({
+    id: gv('f_id').trim() || `PT-${Date.now()}`,
+    arrivalTime: arr,
+    arrivalTimestamp: arr ? ts(arr) : Date.now(),
+    age, sex: gv('f_sex') || null,
+    esiLevel: gv('f_esi') ? parseInt(gv('f_esi')) : null,
+    chiefComplaints: gv('f_complaint').trim() ? [gv('f_complaint').trim()] : [],
+    arrivedByAmbulance: gv('f_amb') === 'true',
+    vitals: {
+      tempF: tempv, hr: isNaN(hrv)?null:hrv, rr: isNaN(rrv)?null:rrv,
+      sbp: isNaN(sbpv)?null:sbpv, dbp: isNaN(dbpv)?null:dbpv,
+      spo2: isNaN(spo2v)?null:spo2v, pain: painv
+    },
+    imaging: {
+      ctHead:g('f_ctHead').checked, ctChest:g('f_ctChest').checked, ctAb:g('f_ctAb').checked,
+      ctpa:g('f_ctpa').checked, ctContrast:g('f_ctContrast').checked,
+      mri:g('f_mri').checked, mriGad:g('f_mriGad').checked, us:g('f_us').checked, xr:g('f_xr').checked
+    }
+  });
+
+  closePanel();
+  ['f_complaint'].forEach(id => g(id).value = '');
+  document.querySelectorAll('#addPanel input[type=checkbox]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('#addPanel input[type=number]').forEach(inp => inp.value = '');
+  document.querySelectorAll('#addPanel select').forEach(sel => sel.selectedIndex = 0);
+
+  renderAll();
+}
+
+// ════════════════════════════════════════════════════
+//  API KEY
+// ════════════════════════════════════════════════════
+
+g('apiKey').addEventListener('input', function() {
+  apiKey = this.value.trim();
+  const st = g('apiStatus');
+  if (apiKey.startsWith('sk-')) {
+    st.textContent = '⚡ Layer 2 Active — GPT-4o reasoning enabled';
+    st.className = 'api-status active';
+    posAnalysis = {}; analysisPending = {};
+    renderAll();
+  } else {
+    st.textContent = 'Layer 2 Inactive — deterministic scoring only';
+    st.className = 'api-status inactive';
+  }
+});
+
+// ════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════
+renderAll();
+</script>
+</body>
+</html>
