@@ -36,13 +36,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
 .header-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(155,28,28,0.25); border: 1px solid rgba(155,28,28,0.5); padding: 4px 12px; border-radius: 2px; font-size: 11px; color: #f5a3a3; align-self: center; }
 
 /* ── API Panel ── */
-.api-panel { background: var(--surface); border-bottom: 1px solid var(--border); padding: 8px 24px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.api-panel label { font-size: 12px; color: var(--text-muted); white-space: nowrap; font-weight: 600; }
-.api-input { flex: 1; min-width: 200px; max-width: 400px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: 2px; font-size: 12px; font-family: 'Courier New', monospace; }
-.api-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,83,155,0.12); }
-.api-status { font-size: 11px; padding: 3px 10px; border-radius: 2px; white-space: nowrap; border: 1px solid; }
-.api-status.active { background: #f0f7f0; color: #1b5e20; border-color: #a5c8a5; }
-.api-status.inactive { background: var(--surface3); color: var(--text-muted); border-color: var(--border); }
+.api-panel { background: var(--surface2); border-bottom: 1px solid var(--border); padding: 4px 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.api-panel label { font-size: 10px; color: var(--text-dim); white-space: nowrap; font-weight: 500; }
+.api-input { width: 220px; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text-muted); padding: 2px 4px; font-size: 11px; font-family: 'Courier New', monospace; }
+.api-input:focus { outline: none; border-bottom-color: var(--accent); color: var(--text); }
+.api-status { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+.api-status.active { color: #2e7d32; }
+.api-status.inactive { color: var(--text-dim); }
 
 /* ── Controls ── */
 .controls { padding: 8px 24px; display: flex; gap: 6px; align-items: center; border-bottom: 1px solid var(--border); background: var(--surface); flex-wrap: wrap; }
@@ -90,8 +90,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
 .ai-card.tier3 { border-left-color: var(--esi3); }
 .ai-card.tier4 { border-left-color: var(--esi4); }
 .ai-card.tier5, .ai-card.tier6 { border-left-color: var(--text-dim); }
-.ai-card.is-tie { outline: 1px solid #7aaed4; outline-offset: -1px; }
-.tie-banner { background: #f0f5fb; border-bottom: 1px solid #c0d8ec; padding: 3px 12px; font-size: 10px; color: var(--accent); font-weight: 600; }
+.ai-card.needs-l2 { outline: 1px solid #7aaed4; outline-offset: -1px; }
+.l2-banner { background: #f0f5fb; border-bottom: 1px solid #c0d8ec; padding: 3px 12px; font-size: 10px; color: var(--accent); font-weight: 600; }
+.highlight-flash { animation: hflash 1s ease-out forwards; }
+@keyframes hflash { 0%,30% { background: #ddeeff; } 100% { background: inherit; } }
+.note-saved { font-size:10px; color:#1b6b3a; opacity:0; transition:opacity 0.3s; margin-left:8px; font-weight:600; }
+.fcfs-card { cursor: pointer; transition: background 0.1s; }
+.fcfs-card:hover { background: var(--surface2) !important; }
 .ai-card-header { padding: 8px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; background: var(--surface); }
 .ai-card-header:hover { background: var(--surface2); }
 .ai-card-body { border-top: 1px solid var(--border); padding: 12px 14px 14px; background: var(--surface2); }
@@ -139,6 +144,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
 .phys-notes { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 7px 10px; border-radius: 0; font-size: 12px; font-family: inherit; min-height: 66px; resize: vertical; }
 .phys-notes:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,83,155,0.1); }
 .phys-notes::placeholder { color: var(--text-dim); }
+.del-btn { background:transparent; border:none; color:var(--text-dim); cursor:pointer; font-size:16px; line-height:1; padding:2px 6px; border-radius:2px; flex-shrink:0; }
+.del-btn:hover { background:#fdf0f0; color:var(--danger); }
+.c5-thresholds { font-size:9px; color:var(--text-dim); margin-top:4px; }
+.live-clock { font-size:11px; color:var(--text-muted); font-variant-numeric:tabular-nums; font-family:'Courier New',monospace; }
+.wait-badge { font-size:10px; color:var(--text-dim); font-variant-numeric:tabular-nums; white-space:nowrap; }
 
 /* ── Position Analysis ── */
 .pos-btn { padding: 5px 12px; border-radius: 2px; background: var(--accent-light); border: 1px solid #aac6e0; color: var(--accent); font-size: 12px; cursor: pointer; transition: background 0.1s; width: 100%; text-align: center; font-family: inherit; font-weight: 500; }
@@ -175,6 +185,36 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
 .cb-item:hover { color: var(--text); }
 .panel-foot { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; position: sticky; bottom: 0; background: var(--surface2); }
 
+/* ── Autocomplete ── */
+.autocomplete-wrap { position: relative; }
+.ac-list { position: absolute; left: 0; right: 0; top: 100%; background: var(--surface); border: 1px solid var(--border-strong); z-index: 200; max-height: 196px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: -1px; }
+.ac-item { padding: 5px 10px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--surface3); user-select: none; }
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover, .ac-item.ac-active { background: var(--accent-light); }
+.ac-system { font-size: 9px; color: var(--text-dim); margin-left: auto; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.3px; }
+.ac-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--esi2); flex-shrink: 0; }
+
+/* ── Protocol Override (Auto-Queue) ── */
+.proto-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:2px; font-size:11px; font-weight:700; letter-spacing:0.3px; white-space:nowrap; }
+.proto-stroke { background:#7f1d1d; color:#fca5a5; border:1px solid #991b1b; }
+.proto-stemi  { background:#78350f; color:#fcd34d; border:1px solid #92400e; }
+.proto-banner { border-bottom:1px solid; padding:4px 12px; font-size:10px; font-weight:600; }
+.stroke-banner { background:#3b0a0a; color:#fca5a5; border-bottom-color:#7f1d1d; }
+.stemi-banner  { background:#3b1c00; color:#fcd34d; border-bottom-color:#92400e; }
+
+/* ── Login Screen ── */
+#login-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 500; padding: 16px; }
+.login-card { background: var(--surface); border: 1px solid var(--border); width: 100%; max-width: 380px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+.login-hd { background: var(--nav-bg); border-bottom: 3px solid #0e2340; padding: 16px 24px 14px; }
+.login-hd h1 { font-size: 14px; font-weight: 600; color: var(--nav-text); letter-spacing: 0; }
+.login-hd p { font-size: 10px; color: var(--nav-sub); margin-top: 3px; }
+.login-hd-badge { display: inline-flex; align-items: center; background: rgba(155,28,28,0.2); border: 1px solid rgba(155,28,28,0.4); padding: 2px 9px; font-size: 10px; color: #f5a3a3; margin-top: 9px; border-radius: 2px; }
+.login-body { padding: 22px 24px 20px; }
+.login-divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; font-size: 10px; color: var(--text-dim); }
+.login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.login-err { font-size: 11px; color: var(--danger); margin-bottom: 10px; display: none; }
+.login-note { font-size: 10px; color: var(--text-dim); text-align: center; margin-top: 8px; }
+
 @media (max-width: 860px) {
   .main { grid-template-columns: 1fr; }
   .queue-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
@@ -184,18 +224,39 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
 </head>
 <body>
 
+<!-- ════ LOGIN SCREEN ════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-hd">
+      <h1>ED Imaging Queue Prioritization Model</h1>
+      <p>Nebraska Medicine &nbsp;|&nbsp; ESI Handbook v4 &nbsp;|&nbsp; AHA/ASA 2019 &nbsp;|&nbsp; NHAMCS 2021</p>
+      <div class="login-hd-badge">Proof-of-Concept — Not a Clinical Decision Support System</div>
+    </div>
+    <div class="login-body">
+      <div class="fg"><label>Username</label><input class="fi" id="l_user" type="text" placeholder="Nebraska Medicine username" autocomplete="username" /></div>
+      <div class="fg"><label>Password</label><input class="fi" id="l_pass" type="password" placeholder="Password" autocomplete="current-password" /></div>
+      <div class="login-err" id="l_err"></div>
+      <button class="btn btn-primary" style="width:100%;padding:7px" onclick="doLogin()">Sign In</button>
+      <div class="login-divider">or</div>
+      <button class="btn btn-ghost" style="width:100%;font-size:11px" onclick="enterDemo()">Enter Demo — no credentials required</button>
+      <div class="login-note">Demo loads sample patient data without authentication</div>
+    </div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
 <!-- ════ HEADER ════ -->
 <header class="header">
   <div class="header-left">
     <h1>ED Imaging Queue Prioritization Model</h1>
-    <p>Nebraska Medicine &nbsp;|&nbsp; ESI Handbook v4 &nbsp;|&nbsp; AHA/ASA 2019 &nbsp;|&nbsp; NHAMCS 2021 &nbsp;|&nbsp; 54-Condition Clinical Reference</p>
+    <p>Nebraska Medicine &nbsp;|&nbsp; ESI Handbook v4 &nbsp;|&nbsp; AHA/ASA 2019 &nbsp;|&nbsp; NHAMCS 2021</p>
   </div>
   <span class="header-badge">Proof-of-Concept — Not a Clinical Decision Support System</span>
 </header>
 
 <!-- ════ API KEY ════ -->
 <div class="api-panel">
-  <label for="apiKey">OpenAI API Key (Layer 2 AI Reasoning):</label>
+  <label for="apiKey">Layer 2 API Key:</label>
   <input type="password" class="api-input" id="apiKey" placeholder="sk-…" autocomplete="off" />
   <span class="api-status inactive" id="apiStatus">Layer 2 Inactive — deterministic scoring only</span>
 </div>
@@ -203,8 +264,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
 <!-- ════ CONTROLS ════ -->
 <div class="controls">
   <button class="btn btn-primary" onclick="openPanel()">+ Add Patient</button>
-  <button class="btn btn-secondary" onclick="loadDemo()">Load Demo Scenario</button>
-  <button class="btn btn-ghost" onclick="clearAll()">Clear All</button>
+  <select id="scenarioSelect" class="fs" style="width:auto;font-size:12px;padding:4px 8px;flex-shrink:0">
+    <option value="trauma">Scenario A — Mass Trauma Surge</option>
+    <option value="afternoon">Scenario B — Busy Afternoon</option>
+    <option value="night">Scenario C — Night Shift</option>
+  </select>
+  <button class="btn btn-secondary" onclick="loadScenario()">Load</button>
+  <button class="btn btn-ghost" style="color:var(--danger);border-color:currentColor" onclick="clearAll()">Clear All</button>
+  <span class="live-clock" id="liveClock"></span>
   <div class="stats-bar" id="statsBar"></div>
 </div>
 
@@ -222,6 +289,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
   <div class="queue-col">
     <div class="queue-head ai-head">
       <div><div class="queue-title" style="color:var(--accent)">AI-Prioritized Queue</div><div class="queue-sub">Urgency score · click a card to expand</div></div>
+      <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;margin-right:4px" onclick="toggleAllCards()" id="expandAllBtn">Expand All</button>
       <span class="queue-badge ai">AI</span>
     </div>
     <div class="queue-body" id="aiQueue">
@@ -240,7 +308,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
   <div class="panel-body">
     <div class="frow">
       <div class="fg"><label>Patient ID</label><input class="fi" id="f_id" placeholder="PT-007" /></div>
+    </div>
+    <div class="frow3">
       <div class="fg"><label>Arrival Time</label><input type="time" class="fi" id="f_arr" /></div>
+      <div class="fg"><label>Admission Time</label><input type="time" class="fi" id="f_adm" /></div>
+      <div class="fg"><label>Imaging Ordered</label><input type="time" class="fi" id="f_img_time" /></div>
     </div>
     <div class="frow">
       <div class="fg">
@@ -260,20 +332,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
           <option value="">Unknown</option>
           <option value="M">Male</option>
           <option value="F">Female</option>
+          <option value="O">Other</option>
         </select>
       </div>
     </div>
     <div class="frow">
       <div class="fg"><label>Age (years)</label><input type="number" class="fi" id="f_age" min="0" max="120" placeholder="—" /></div>
       <div class="fg">
-        <label>Arrived by Ambulance</label>
-        <select class="fs" id="f_amb">
-          <option value="false">No — walk-in</option>
-          <option value="true">Yes</option>
+        <label>Transport Code</label>
+        <select class="fs" id="f_tc">
+          <option value="walk-in">Walk-in</option>
+          <option value="private-vehicle">Private Vehicle</option>
+          <option value="taxi-rideshare">Taxi / Rideshare</option>
+          <option value="code1">EMS Code 1 (routine)</option>
+          <option value="code2">EMS Code 2 (urgent)</option>
+          <option value="code2-cardiac">EMS Code 2 Cardiac</option>
+          <option value="code3-stroke">⚡ Code 3 — Stroke Protocol</option>
+          <option value="code3-stemi">⚡ Code 3 — STEMI Protocol</option>
         </select>
       </div>
     </div>
-    <div class="fg"><label>Chief Complaint(s)</label><textarea class="fta" id="f_complaint" placeholder="Describe presenting symptoms, onset, associated findings…"></textarea></div>
+    <div class="fg"><label>Chief Complaint(s)</label>
+      <div class="autocomplete-wrap">
+        <textarea class="fta" id="f_complaint" placeholder="Describe presenting symptoms, onset, associated findings…"></textarea>
+        <div class="ac-list" id="ac_list" style="display:none"></div>
+      </div>
+    </div>
 
     <div class="section-sep">Vital Signs</div>
     <div class="frow3">
@@ -300,12 +384,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
       <label class="cb-item"><input type="checkbox" id="f_us" /> Ultrasound / Doppler</label>
       <label class="cb-item"><input type="checkbox" id="f_xr" /> X-Ray</label>
     </div>
+
+    <div class="section-sep">Physician Notes</div>
+    <div class="fg">
+      <textarea class="fta phys-notes" id="f_notes" style="min-height:80px" placeholder="Clinical history, imaging rationale, relevant findings for the radiologist…"></textarea>
+    </div>
   </div>
   <div class="panel-foot">
     <button class="btn btn-ghost" onclick="closePanel()">Cancel</button>
     <button class="btn btn-primary" onclick="submitPatient()">Add to Queue</button>
   </div>
 </div>
+</div><!-- /#app -->
 
 <script>
 // ════════════════════════════════════════════════════
@@ -315,6 +405,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
 const ESI_BASE = {1:100, 2:75, 3:45, 4:15, 5:5};
 const ESI_LABELS = {1:'Immediate',2:'Emergent',3:'Urgent',4:'Semi-Urgent',5:'Non-Urgent'};
 const TIER_SCORE = {1:40, 2:30, 3:20, 4:10, 5:5, 6:0};
+const TRANSPORT_SCORES = {
+  'walk-in':0, 'private-vehicle':0, 'taxi-rideshare':0,
+  'code1':3, 'code2':5, 'code2-cardiac':8,
+  'code3-stroke':'AUTO', 'code3-stemi':'AUTO'
+};
+const TRANSPORT_LABELS = {
+  'walk-in':'Walk-in', 'private-vehicle':'Private Vehicle', 'taxi-rideshare':'Taxi / Rideshare',
+  'code1':'EMS Code 1 (routine)', 'code2':'EMS Code 2 (urgent)', 'code2-cardiac':'EMS Code 2 Cardiac',
+  'code3-stroke':'EMS Code 3 — Stroke Protocol', 'code3-stemi':'EMS Code 3 — STEMI Protocol'
+};
+
+// Max theoretical raw score: C1(100)+C2(40)+C3(15)+C4(35)+C5(8)+C6(5)+C7(10) = 213
+const MAX_RAW_SCORE = 213;
+function displayScore(raw) { return Math.round(raw / MAX_RAW_SCORE * 100); }
 
 // Condition library — each condition has:
 //   tier (1–6), weight (higher = more distinguishing key matches),
@@ -582,8 +686,8 @@ function getImagingScore(img, condId) {
   const torsionConds = ['testicular_torsion'];
 
   if (img.ctHead) {
-    const lbl = neuroHeadConds.includes(condId) ? 'CT Head (neuro/stroke protocol)' : 'CT Head';
-    return {score:15, label:lbl};
+    const isNeuro = neuroHeadConds.includes(condId);
+    return {score: isNeuro ? 15 : 8, label: isNeuro ? 'CT Head (neuro/stroke protocol)' : 'CT Head'};
   }
   if (img.ctpa) return {score:12, label:'CTPA (PE protocol)'};
   if (img.mriGad || img.mri) {
@@ -652,7 +756,11 @@ function calcC4(v, age) {
     if (spo2 < 90)      { raw += 20; flags.push('SpO₂ <90% — ESI 1 criterion'); }
     else if (spo2 < 92) { raw += 15; flags.push('SpO₂ <92% — danger zone (uptriage ESI 2)'); }
   }
-  if (sbp != null && sbp < 90) { raw += 20; flags.push('SBP <90 mmHg — hemodynamic instability'); }
+  if (sbp != null) {
+    if (sbp < 90)       { raw += 20; flags.push('SBP <90 mmHg — hemodynamic instability'); }
+    else if (sbp >= 180){ raw += 12; flags.push('SBP ≥180 — hypertensive emergency'); }
+    else if (sbp >= 160){ raw += 8;  flags.push('SBP 160–179 — severe hypertension'); }
+  }
 
   if (hr != null) {
     const a = age ?? 99;
@@ -707,7 +815,10 @@ function calcScore(pt) {
     else                  { c5 = 0; c5Lbl = `${v.pain}/10 — Mild`; }
   }
 
-  const c6 = pt.arrivedByAmbulance ? 5 : 0;
+  const tc = pt.transportCode || 'walk-in';
+  const isAutoQueue = tc === 'code3-stroke' || tc === 'code3-stemi';
+  const c6 = isAutoQueue ? 0 : (TRANSPORT_SCORES[tc] || 0);
+  const c6Lbl = TRANSPORT_LABELS[tc] || 'Walk-in';
 
   let c7 = 0, c7Lbl = '—';
   if (age != null) {
@@ -735,7 +846,8 @@ function calcScore(pt) {
 
   return { total, c1, c2, c3, c4, c5, c6, c7,
     condition, imgLabel: imgRes.label, c4Flags: c4Res.flags, c4Capped: c4Res.capped,
-    c5Lbl, c7Lbl, completeness, confidence, esiLabel: esi ? ESI_LABELS[esi] : 'Unknown', vitalTriad };
+    c5Lbl, c6Lbl, c7Lbl, completeness, confidence, esiLabel: esi ? ESI_LABELS[esi] : 'Unknown', vitalTriad,
+    isAutoQueue, transportCode: tc };
 }
 
 // ════════════════════════════════════════════════════
@@ -744,33 +856,40 @@ function calcScore(pt) {
 
 function rankPatients(pts) {
   const scored = pts.map(p => ({...p, _s: calcScore(p)}));
-  scored.sort((a, b) => b._s.total - a._s.total);
+  const autoQueue = scored.filter(p => p._s.isAutoQueue);
+  const normal = scored.filter(p => !p._s.isAutoQueue);
+
+  autoQueue.sort((a, b) => (a.arrivalTimestamp||0) - (b.arrivalTimestamp||0));
+  normal.sort((a, b) => b._s.total - a._s.total);
+
+  const ranked = [...autoQueue, ...normal];
+  const offset = autoQueue.length;
 
   const pairs = [];
-  // Adjacent score tiebreakers (≤10 pts)
-  for (let i = 0; i < scored.length - 1; i++) {
-    const gap = Math.abs(scored[i]._s.total - scored[i+1]._s.total);
-    if (gap <= 10) pairs.push({type:'tie', gap, idx1:i, idx2:i+1, p1:scored[i], p2:scored[i+1]});
+  // Adjacent score tiebreakers (≤10 pts) — only among normal patients
+  for (let i = offset; i < ranked.length - 1; i++) {
+    const gap = Math.abs(ranked[i]._s.total - ranked[i+1]._s.total);
+    if (gap <= 10) pairs.push({type:'tie', gap, idx1:i, idx2:i+1, p1:ranked[i], p2:ranked[i+1]});
   }
   // Vital triad trigger
-  for (let i = 0; i < scored.length; i++) {
-    if (scored[i]._s.vitalTriad) {
+  for (let i = offset; i < ranked.length; i++) {
+    if (ranked[i]._s.vitalTriad) {
       const already = pairs.some(p => p.idx1===i || p.idx2===i);
-      if (!already && i < scored.length-1) {
-        const gap = Math.abs(scored[i]._s.total - scored[i+1]._s.total);
-        if (gap <= 20) pairs.push({type:'triad', gap, idx1:i, idx2:i+1, p1:scored[i], p2:scored[i+1]});
+      if (!already && i < ranked.length-1) {
+        const gap = Math.abs(ranked[i]._s.total - ranked[i+1]._s.total);
+        if (gap <= 20) pairs.push({type:'triad', gap, idx1:i, idx2:i+1, p1:ranked[i], p2:ranked[i+1]});
       }
     }
   }
   // Incomplete data
-  for (let i = 0; i < scored.length; i++) {
-    if (scored[i]._s.completeness !== 'complete') {
+  for (let i = offset; i < ranked.length; i++) {
+    if (ranked[i]._s.completeness !== 'complete') {
       const already = pairs.some(p => p.idx1===i || p.idx2===i);
-      if (!already) pairs.push({type:'incomplete', idx1:i, idx2:-1, p1:scored[i], p2:null});
+      if (!already) pairs.push({type:'incomplete', idx1:i, idx2:-1, p1:ranked[i], p2:null});
     }
   }
 
-  return {ranked: scored, pairs};
+  return {ranked, pairs};
 }
 
 // ════════════════════════════════════════════════════
@@ -800,12 +919,13 @@ function ptInfo(p) {
   if (im.mri || im.mriGad) imgs.push('MRI'+(im.mriGad?' +Gad':''));
   if (im.us) imgs.push('Ultrasound/Doppler');
   if (im.xr) imgs.push('X-Ray');
-  return `ID: ${p.id} | ESI: ${p.esiLevel??'Unknown'} | Age: ${p.age??'Unknown'}${p.sex?p.sex:''} | Score: ${p._s.total}
+  return `ID: ${p.id} | ESI: ${p.esiLevel??'Unknown'} | Age: ${p.age??'Unknown'}${p.sex?p.sex:''} | Score: ${displayScore(p._s.total)}/100
+Arrived: ${p.arrivalTime||'—'} | Admitted: ${p.admissionTime||'—'} | Imaging ordered: ${p.imagingOrderedTime||'—'}
 Chief Complaint: "${(p.chiefComplaints||[]).join('; ')}"
 Condition (Layer 1): ${p._s.condition?.name??'Undetermined'} (Tier ${p._s.condition?.tier??'?'})
 Imaging: ${imgs.join(', ')||'None'}
 Vitals: HR ${v.hr??'?'} | RR ${v.rr??'?'} | BP ${v.sbp??'?'}/${v.dbp??'?'} | SpO₂ ${v.spo2??'?'}% | Temp ${v.tempF??'?'}°F | Pain ${v.pain??'?'}/10
-Ambulance: ${p.arrivedByAmbulance?'Yes':'No'}`;
+Transport: ${TRANSPORT_LABELS[p.transportCode] || 'Walk-in'}`;
 }
 
 function buildPositionPrompt(pt, above, below, rank, total) {
@@ -880,9 +1000,9 @@ async function generateAnalysis(id) {
 // ════════════════════════════════════════════════════
 
 function scoreClass(n) {
-  if (n >= 120) return 'crit';
-  if (n >= 90)  return 'high';
-  if (n >= 60)  return 'modhigh';
+  if (n >= 56) return 'crit';
+  if (n >= 42) return 'high';
+  if (n >= 28) return 'modhigh';
   return 'mod';
 }
 function tierClass(t) { return 'tier' + Math.min(t, 6); }
@@ -919,27 +1039,35 @@ function escHtml(s) {
 }
 
 function renderBreakdown(s) {
+  if (s.isAutoQueue) {
+    const proto = s.transportCode === 'code3-stroke' ? 'EMS Code 3 — Stroke Protocol' : 'EMS Code 3 — STEMI Protocol';
+    return '<div style="font-size:11px;color:var(--text-muted);padding:6px 0">'
+      + '<strong style="color:var(--text)">Protocol Override Active:</strong> ' + proto + '<br>'
+      + '<span style="font-size:10px;color:var(--text-dim)">Scoring bypassed — protocol override active.</span>'
+      + '</div>';
+  }
   const rows = [
     ['C1 — ESI Level', s.esiLabel, s.c1],
     ['C2 — Condition Tier', condLabel(s.condition), s.c2],
     ['C3 — Imaging Modality', s.imgLabel || 'None', s.c3],
     ['C4 — Vital Signs', s.c4Flags?.length ? s.c4Flags.join('; ') : 'No danger zone findings', s.c4],
     ['C5 — Pain Scale', s.c5Lbl || '—', s.c5],
-    ['C6 — Arrival Mode', s.c6 > 0 ? 'Ambulance (+5)' : 'Walk-in (±0)', s.c6],
+    ['C6 — Transport Code', s.c6Lbl || 'Walk-in', s.c6],
     ['C7 — Age Risk', s.c7Lbl || '—', s.c7],
   ];
   return '<table class="score-tbl">'
     + '<tr style="font-size:9px;color:var(--text-dim)"><td>COMPONENT</td><td>VALUE</td><td style="text-align:right">PTS</td></tr>'
     + rows.map(([c,v,p]) => '<tr><td>' + c + '</td><td>' + v + '</td><td style="color:' + (p > 0 ? 'var(--text)' : 'var(--text-dim)') + '">+' + p + '</td></tr>').join('')
-    + '<tr class="trow-total"><td colspan="2">URGENCY</td><td style="font-size:14px;text-align:right">' + s.total + '</td></tr>'
+    + '<tr class="trow-total"><td colspan="2">URGENCY SCORE</td><td style="font-size:14px;text-align:right">' + displayScore(s.total) + '<br><span style="font-size:9px;font-weight:400;color:var(--text-dim)">raw: ' + s.total + '</span></td></tr>'
     + '</table>'
-    + (s.c4Capped ? '<div style="font-size:9px;color:var(--text-dim);margin-top:3px">C4 capped at 35</div>' : '');
+    + (s.c4Capped ? '<div style="font-size:9px;color:var(--text-dim);margin-top:3px">C4 capped at 35</div>' : '')
+    + '<div class="c5-thresholds">C5 thresholds: 0–4 = Mild (+0) · 5–6 = Moderate (+3) · 7–8 = Severe (+5) · 9–10 = Severe (+8)</div>';
 }
 
 function renderFCFSCard(pt, rank) {
   const s = pt._s;
   const tc = tierClass(s.condition?.tier || 6);
-  return '<div class="fcfs-card ' + tc + '">'
+  return '<div class="fcfs-card ' + tc + '" title="Click to jump to AI queue" onclick="scrollToAI(\'' + pt.id.replace(/'/g,"\\'") + '\')">'
     + '<div class="rank-sm">' + rank + '</div>'
     + '<div style="flex:1;min-width:0;overflow:hidden">'
       + '<div style="font-size:11px;font-weight:700;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(pt.id) + '</div>'
@@ -976,7 +1104,7 @@ function renderAICard(pt, rank, total, isTie) {
   const below = rank < total ? rankedOrder[rank] : null;
   let analysisHtml;
   if (!apiKey) {
-    analysisHtml = '<div style="font-size:11px;color:var(--text-dim)">Enter an OpenAI API key above to enable AI position analysis.</div>';
+    analysisHtml = '';
   } else if (analysisPending[pt.id]) {
     analysisHtml = '<div class="pos-result"><div class="l2-loading"><div class="spinner"></div>Generating AI position analysis…</div></div>';
   } else if (posAnalysis[pt.id]?.error) {
@@ -994,27 +1122,42 @@ function renderAICard(pt, rank, total, isTie) {
       + '<button class="pos-btn" onclick="generateAnalysis(\'' + pt.id + '\');event.stopPropagation()">Generate Position Analysis</button>';
   }
 
-  return '<div class="ai-card ' + tc + (isTie ? ' is-tie' : '') + '" id="aic-' + safeId + '">'
-    + (isTie ? '<div class="tie-banner">Layer 2 Analysis Recommended</div>' : '')
+  const waitMin = pt.arrivalTimestamp ? Math.round((Date.now() - pt.arrivalTimestamp) / 60000) : null;
+  const waitStr = waitMin != null ? (waitMin < 1 ? '<1 min' : waitMin + ' min') : '—';
+
+  return '<div class="ai-card ' + tc + (isTie ? ' needs-l2' : '') + '" id="aic-' + safeId + '">'
+    + (s.isAutoQueue
+      ? '<div class="proto-banner ' + (s.transportCode === 'code3-stroke' ? 'stroke-banner' : 'stemi-banner') + '">'
+        + (s.transportCode === 'code3-stroke' ? 'CODE 3 STROKE' : 'CODE 3 STEMI')
+        + '</div>'
+      : (isTie ? '<div class="l2-banner">Layer 2 Analysis Recommended</div>' : ''))
     + '<div class="ai-card-header" onclick="toggleCard(\'' + pt.id + '\')">'
       + '<div class="rank-circle">' + rank + '</div>'
       + '<div style="flex:1;min-width:0">'
         + '<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">'
           + '<span class="patient-id">' + escHtml(pt.id) + '</span>'
           + '<span class="esi-badge ' + esiClass(pt.esiLevel) + '">ESI ' + (pt.esiLevel || '?') + '</span>'
+          + '<span class="wait-badge" data-pt-id="' + escHtml(pt.id) + '" data-arrive="' + (pt.arrivalTimestamp||0) + '">⏱ ' + waitStr + '</span>'
         + '</div>'
         + '<div class="cond-name">' + condLabel(s.condition) + '</div>'
       + '</div>'
       + '<div style="text-align:right;flex-shrink:0">'
-        + '<div class="score-val ' + scoreClass(s.total) + '">' + s.total + '</div>'
-        + '<div class="score-lbl">urgency</div>'
+        + (s.isAutoQueue
+          ? '<div class="proto-badge ' + (s.transportCode === 'code3-stroke' ? 'proto-stroke' : 'proto-stemi') + '">'
+            + (s.transportCode === 'code3-stroke' ? '⚡ STROKE' : '⚡ STEMI') + '</div>'
+          : '<div class="score-val ' + scoreClass(displayScore(s.total)) + '">' + displayScore(s.total) + '</div>'
+            + '<div class="score-lbl">urgency</div>')
       + '</div>'
-      + '<span class="chevron" style="color:var(--text-dim);font-size:13px;flex-shrink:0;margin-left:6px">' + (isExp ? '▴' : '▾') + '</span>'
+      + '<button class="del-btn" title="Remove patient" onclick="deletePatient(\'' + escHtml(pt.id) + '\');event.stopPropagation()">×</button>'
+      + '<span class="chevron" style="color:var(--text-dim);font-size:13px;flex-shrink:0;margin-left:4px">' + (isExp ? '▴' : '▾') + '</span>'
     + '</div>'
     + '<div class="ai-card-body" id="body-' + safeId + '" style="' + (isExp ? '' : 'display:none') + '">'
       + '<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">'
-        + (pt.age != null ? pt.age : '?') + (pt.sex || '') + ' · Arrived ' + (pt.arrivalTime || '—')
-        + ' · ' + (pt.arrivedByAmbulance ? 'Ambulance' : 'Walk-in')
+        + (pt.age != null ? pt.age : '?') + (pt.sex || '')
+        + ' · Arrived <strong style="color:var(--text)">' + (pt.arrivalTime || '—') + '</strong>'
+        + ' · Admitted <strong style="color:var(--text)">' + (pt.admissionTime || '—') + '</strong>'
+        + ' · Imaging ordered <strong style="color:var(--text)">' + (pt.imagingOrderedTime || '—') + '</strong>'
+        + ' · ' + (TRANSPORT_LABELS[pt.transportCode] || 'Walk-in')
         + ' · ' + imagingText(pt.imaging)
       + '</div>'
       + '<div style="font-size:12px;color:var(--text-muted);line-height:1.55;margin-bottom:8px">'
@@ -1030,8 +1173,10 @@ function renderAICard(pt, rank, total, isTie) {
       + '<textarea class="phys-notes" placeholder="Add imaging request context, clinical history, or observations for the radiologist…"'
         + ' onclick="event.stopPropagation()"'
         + ' oninput="saveNote(\'' + pt.id + '\',this.value)">' + note + '</textarea>'
-      + '<div class="sec-lbl blue" style="margin-top:16px">AI Position Analysis</div>'
-      + '<div id="pos-' + safeId + '">' + analysisHtml + '</div>'
+      + '<span class="note-saved" id="ns-' + safeId + '">Saved</span>'
+      + (apiKey ? '<div class="sec-lbl blue" style="margin-top:16px">AI Position Analysis</div>'
+          + '<div id="pos-' + safeId + '">' + analysisHtml + '</div>'
+        : '<div id="pos-' + safeId + '" style="display:none"></div>')
     + '</div>'
   + '</div>';
 }
@@ -1051,6 +1196,13 @@ function toggleCard(id) {
 
 function saveNote(id, val) {
   physNotes[id] = val;
+  const safeId = id.replace(/\W/g,'_');
+  const ind = document.getElementById('ns-' + safeId);
+  if (ind) {
+    ind.style.opacity = '1';
+    clearTimeout(ind._t);
+    ind._t = setTimeout(() => { ind.style.opacity = '0'; }, 1600);
+  }
 }
 
 // ════════════════════════════════════════════════════
@@ -1085,16 +1237,17 @@ function renderAll() {
 
   const tier1 = ranked.filter(p => p._s.condition?.tier <= 1).length;
   const tier2 = ranked.filter(p => p._s.condition?.tier === 2).length;
-  const avg = Math.round(ranked.reduce((s,p) => s + p._s.total, 0) / ranked.length);
+  const scorable = ranked.filter(p => !p._s.isAutoQueue);
+  const avg = scorable.length ? displayScore(Math.round(scorable.reduce((s,p) => s + p._s.total, 0) / scorable.length)) : 0;
   statsEl.innerHTML = '<span>Patients: <strong>' + patients.length + '</strong></span>'
     + '<span style="color:var(--esi1)">Tier 1: <strong>' + tier1 + '</strong></span>'
     + '<span style="color:var(--esi2)">Tier 2: <strong>' + tier2 + '</strong></span>'
-    + '<span>Avg Urgency: <strong>' + avg + '</strong></span>'
+    + '<span>Avg Urgency: <strong>' + avg + '</strong> <span style="font-size:10px;color:var(--text-dim)">(' + scorable.length + ' scored)</span></span>'
     + (tieIds.size ? '<span style="color:var(--accent)">Layer 2 recommended: ' + tieIds.size + '</span>' : '');
 }
 
 // ════════════════════════════════════════════════════
-//  DEMO PATIENTS
+//  DEMO SCENARIOS
 // ════════════════════════════════════════════════════
 
 function ts(t) {
@@ -1102,54 +1255,172 @@ function ts(t) {
   return new Date(d.getFullYear(),d.getMonth(),d.getDate(),h,m,0).getTime();
 }
 
-const DEMO = [
-  // PT-003 arrives FIRST (appendicitis — monopolizes top FCFS spot despite moderate urgency)
-  { id:'PT-003', arrivalTime:'14:05', arrivalTimestamp:null, age:29, sex:'F', esiLevel:3,
-    chiefComplaints:['Right lower quadrant pain, worsening since yesterday, nausea, loss of appetite, mild fever'],
-    arrivedByAmbulance:false,
-    vitals:{tempF:100.8, hr:103, rr:17, sbp:116, dbp:74, spo2:99, pain:7},
-    imaging:{ctHead:false,ctChest:false,ctAb:true,ctpa:false,ctContrast:true,mri:false,mriGad:false,us:false,xr:false}},
-  // PT-004 (chest pain ACS workup — tiebreaker with PT-005)
-  { id:'PT-004', arrivalTime:'14:18', arrivalTimestamp:null, age:57, sex:'M', esiLevel:3,
-    chiefComplaints:['Chest pressure with diaphoresis and shortness of breath, onset 2 hours, radiating to left arm, troponin mildly elevated, no ST elevation on ECG'],
-    arrivedByAmbulance:false,
-    vitals:{tempF:98.4, hr:90, rr:16, sbp:128, dbp:82, spo2:97, pain:5},
-    imaging:{ctHead:false,ctChest:false,ctAb:false,ctpa:true,ctContrast:false,mri:false,mriGad:false,us:false,xr:false}},
-  // PT-005 (sudden headache — tiebreaker with PT-004; possible SAH not captured by Layer 1)
-  { id:'PT-005', arrivalTime:'14:22', arrivalTimestamp:null, age:44, sex:'F', esiLevel:3,
-    chiefComplaints:['Severe headache with sudden onset 2 hours ago, associated nausea, no focal neurological deficits, no prior history of similar headache'],
-    arrivedByAmbulance:false,
-    vitals:{tempF:98.7, hr:80, rr:14, sbp:148, dbp:90, spo2:99, pain:8},
-    imaging:{ctHead:true,ctChest:false,ctAb:false,ctpa:false,ctContrast:false,mri:false,mriGad:false,us:false,xr:false}},
-  // PT-002 (suspected PE — arrives 4th despite being 2nd most urgent)
-  { id:'PT-002', arrivalTime:'14:38', arrivalTimestamp:null, age:56, sex:'M', esiLevel:3,
-    chiefComplaints:['Sudden shortness of breath and right-sided chest pain worse with breathing, right leg swelling for 5 days — pulmonary embolism work-up'],
-    arrivedByAmbulance:false,
-    vitals:{tempF:98.6, hr:106, rr:22, sbp:122, dbp:78, spo2:95, pain:4},
-    imaging:{ctHead:false,ctChest:false,ctAb:false,ctpa:true,ctContrast:false,mri:false,mriGad:false,us:false,xr:false}},
-  // PT-006 (incomplete data — Layer 2 incomplete trigger)
-  { id:'PT-006', arrivalTime:'14:52', arrivalTimestamp:null, age:null, sex:null, esiLevel:null,
-    chiefComplaints:['Pain'],
-    arrivedByAmbulance:false,
-    vitals:{tempF:null,hr:null,rr:null,sbp:null,dbp:null,spo2:null,pain:null},
-    imaging:{ctHead:false,ctChest:false,ctAb:true,ctpa:false,ctContrast:false,mri:false,mriGad:false,us:false,xr:false}},
-  // PT-001 arrives LAST (stroke — should be #1 in AI queue but 6th in FCFS)
-  { id:'PT-001', arrivalTime:'15:04', arrivalTimestamp:null, age:71, sex:'F', esiLevel:2,
-    chiefComplaints:['Sudden right arm weakness and facial droop, onset 55 minutes ago, slurred speech'],
-    arrivedByAmbulance:true,
-    vitals:{tempF:98.6, hr:84, rr:16, sbp:172, dbp:98, spo2:97, pain:1},
-    imaging:{ctHead:true,ctChest:false,ctAb:false,ctpa:false,ctContrast:false,mri:false,mriGad:false,us:false,xr:false}},
-];
+function pt(id, arr, adm, img, age, sex, esi, complaint, tc, vitals, imaging) {
+  return { id, arrivalTime:arr, admissionTime:adm, imagingOrderedTime:img,
+    arrivalTimestamp:null, admissionTimestamp:null, imagingOrderedTimestamp:null,
+    age, sex, esiLevel:esi, chiefComplaints:[complaint], transportCode:tc,
+    vitals, imaging };
+}
+function im(flags) {
+  const base = {ctHead:false,ctChest:false,ctAb:false,ctpa:false,ctContrast:false,mri:false,mriGad:false,us:false,xr:false};
+  return Object.assign(base, flags);
+}
 
-function loadDemo() {
-  posAnalysis = {}; analysisPending = {}; physNotes = {}; expandedCards = new Set();
-  patients = DEMO.map(p => ({...p, arrivalTimestamp: ts(p.arrivalTime)}));
+// ── Scenario A: Mass Trauma Surge ──────────────────
+const DEMO_TRAUMA = [
+  pt('TC-01','07:05','07:07','07:09', 34,'M',1,
+    'Tension pneumothorax — tracheal deviation, absent breath sounds right side, MVA ejection, needle decompression at scene',
+    'code2', {tempF:98.2, hr:134, rr:30, sbp:88, dbp:54, spo2:82, pain:8}, im({ctChest:true})),
+  pt('TC-02','07:12','07:14','07:18', 22,'F',1,
+    'Pelvic ring fracture from MVA — hemorrhagic shock, massive transfusion protocol activated, FAST negative',
+    'code2', {tempF:97.8, hr:132, rr:24, sbp:76, dbp:44, spo2:94, pain:9}, im({ctAb:true,ctContrast:true})),
+  pt('TC-03','07:21','07:23','07:25', 31,'F',1,
+    'Ruptured ectopic pregnancy — positive hCG, sudden severe pelvic pain, hemodynamically unstable, FAST positive free fluid',
+    'code2', {tempF:98.8, hr:126, rr:20, sbp:82, dbp:52, spo2:96, pain:9}, im({us:true})),
+  pt('TC-04','07:35','07:38','07:42', 45,'M',2,
+    'Sudden tearing chest and back pain radiating to jaw, pulse discrepancy right vs left arm — suspected aortic dissection type A',
+    'code2', {tempF:98.4, hr:108, rr:18, sbp:182, dbp:94, spo2:97, pain:9}, im({ctChest:true,ctContrast:true})),
+  pt('TC-05','07:44','07:46','07:48', 67,'M',2,
+    'ST elevation anterior leads, crushing chest pain, diaphoresis, cardiogenic shock — STEMI protocol',
+    'code3-stemi', {tempF:97.6, hr:48, rr:22, sbp:74, dbp:50, spo2:92, pain:8}, im({us:true})),
+  pt('TC-06','07:58','08:04','08:10', 52,'M',3,
+    'Right femur fracture from motorcycle collision, significant blood loss at scene, traction splint applied',
+    'code2', {tempF:98.6, hr:112, rr:18, sbp:104, dbp:68, spo2:98, pain:8}, im({xr:true})),
+];
+const NOTES_TRAUMA = {
+  'TC-01': '34M, high-speed MVA, ejected. Tracheal deviation, absent BS R side. SpO2 82% on 15L NRB. Tension pneumo — needle decompression at scene, partial improvement. Chest tube pending. CT chest — r/o hemothorax, assess residual pneumo.',
+  'TC-02': '22F, unrestrained passenger MVA. Pelvic ring disruption on clinical exam. BP 76/44 on arrival, MTP activated — O-neg running. 2 large-bore IVs. CT abd/pelvis c contrast — r/o solid organ injury, assess vascular blush.',
+  'TC-03': '31F, LMP 7wk, sudden L pelvic pain + R shoulder tip pain (diaphragmatic irritation). FAST positive — free fluid Morrison\'s pouch. hCG positive. BP 82/52, HR 126. POCUS — ruptured ectopic confirmed, OR notified STAT.',
+  'TC-04': '45M, sudden tearing chest + interscapular pain. R arm BP 182/92, L arm BP 138/80 — 44 mmHg pulse discrepancy. No prior cardiac hx. Type A dissection until proven otherwise. Cards + CT surgery notified. CTA chest — r/o dissection, assess entry tear.',
+  'TC-05': '67M, crushing anterior CP + diaphoresis. EKG: STE V1-V4, new LBBB. HR 48, BP 74/50 — cardiogenic shock. Dopamine started. Cath lab on standby. Echo — LV function, wall motion, pericardial effusion.',
+  'TC-06': '52M, motorcycle vs. car, helmeted. Mid-shaft R femur Fx, traction splint in place. Est. 1-1.5L blood loss at scene. HR 112, BP 104/68 — borderline. XR — confirm fracture pattern, assess alignment pre-OR.',
+};
+
+// ── Scenario B: Busy Afternoon ─────────────────────
+const DEMO_AFTERNOON = [
+  pt('AF-01','13:10','13:22','13:35', 71,'F',3,
+    'Bowel obstruction — abdominal distension, bilious vomiting for 3 days, no flatus, prior colostomy history',
+    'walk-in', {tempF:99.4, hr:102, rr:16, sbp:124, dbp:80, spo2:98, pain:7}, im({ctAb:true})),
+  pt('AF-02','13:18','13:27','13:38', 29,'M',3,
+    'Acute right flank pain radiating to groin, hematuria, nausea — renal colic workup',
+    'walk-in', {tempF:98.8, hr:96, rr:14, sbp:134, dbp:84, spo2:99, pain:9}, im({ctAb:true,ctContrast:true})),
+  pt('AF-03','13:29','13:40','13:48', 58,'F',3,
+    'Syncope with fall and head trauma, brief loss of consciousness, scalp laceration, on warfarin for atrial fibrillation — intracranial hemorrhage workup',
+    'code1', {tempF:98.4, hr:78, rr:14, sbp:138, dbp:84, spo2:99, pain:4}, im({ctHead:true})),
+  pt('AF-04','13:44','13:55','14:08', 33,'F',3,
+    'Right lower quadrant pain, nausea, anorexia, rebound tenderness, low-grade fever — appendicitis workup',
+    'walk-in', {tempF:101.2, hr:104, rr:16, sbp:118, dbp:72, spo2:99, pain:7}, im({ctAb:true,ctContrast:true})),
+  pt('AF-05','13:58','14:00','14:04', 44,'M',2,
+    'Sudden left facial droop, right arm weakness, slurred speech — onset approximately 90 minutes ago',
+    'code3-stroke', {tempF:98.6, hr:88, rr:14, sbp:168, dbp:96, spo2:97, pain:2}, im({ctHead:true})),
+  pt('AF-06','14:15','14:30',null, 82,'M',4,
+    'New confusion, dysuria, frequency, low-grade fever — urinary tract infection in elderly patient, rule out urosepsis',
+    'walk-in', {tempF:100.2, hr:86, rr:14, sbp:132, dbp:78, spo2:97, pain:2}, im({})),
+];
+const NOTES_AFTERNOON = {
+  'AF-01': '71F, colostomy hx, progressive abd distension x3d, no flatus or BM. Bilious emesis. AXR: dilated loops, air-fluid levels. CT abd — r/o closed-loop obstruction, assess transition point, r/o perforation.',
+  'AF-02': '29M, colicky R flank pain → R groin, microscopic hematuria on dipstick. Classic ureteral colic presentation. Pain 9/10. CT urogram — r/o nephrolithiasis, assess stone size, location, degree of obstruction.',
+  'AF-03': '58F, syncopal episode at home, fell and struck head. Scalp lac sutured. Brief LOC. On warfarin for afib — INR 3.4 last week. CT head — r/o subdural or epidural hemorrhage before any anticoagulation decision.',
+  'AF-04': '33F, RLQ pain x2d, anorexia, nausea, rebound + guarding. Temp 101.2, HR 104. WBC pending. Alvarado ~7. CT abd/pelvis c contrast — r/o appendicitis, perforation, peri-appendiceal abscess.',
+  'AF-05': '44M, sudden L facial droop + R arm weakness, onset ~90 min PTA. Slurred speech. NIHSS 12 at triage. Last known well 1230. BP 168/96. Stroke alert active. CT head — r/o hemorrhage before thrombolytics.',
+  'AF-06': '82M, wife noted new confusion x1d. c/o dysuria, frequency. Temp 100.2. UA dipstick: nitrites +, LE +. UTI likely — urine cx ordered, blood cx x2. Monitoring for sepsis criteria (qSOFA 1 at triage).',
+};
+
+// ── Scenario C: Deceptive Night Shift ─────────────
+const DEMO_NIGHT = [
+  pt('NT-01','22:15','22:28','22:41', 61,'F',3,
+    'Diffuse abdominal pain, nausea, vomiting for 3 days — pain out of proportion to exam findings, elevated lactate, known atrial fibrillation',
+    'walk-in', {tempF:99.0, hr:106, rr:18, sbp:118, dbp:74, spo2:98, pain:6}, im({ctAb:true,ctContrast:true})),
+  pt('NT-02','22:27','22:38',null, 48,'M',3,
+    'Syncopal episode with preceding diaphoresis and chest tightness, troponin pending — acute coronary syndrome workup',
+    'walk-in', {tempF:98.4, hr:68, rr:14, sbp:122, dbp:76, spo2:98, pain:3}, im({})),
+  pt('NT-03','22:39','22:50','23:02', 76,'F',3,
+    'Right leg swelling, worsening shortness of breath, pleuritic right-sided chest pain — pulmonary embolism workup, Wells high probability',
+    'code2', {tempF:98.6, hr:112, rr:22, sbp:118, dbp:74, spo2:93, pain:3}, im({ctpa:true})),
+  pt('NT-04','22:51','23:01','23:08', 24,'F',3,
+    'Thunderclap headache — sudden severe onset during exercise, worst headache of her life, nausea, no prior headache history',
+    'walk-in', {tempF:98.6, hr:76, rr:14, sbp:152, dbp:88, spo2:99, pain:9}, im({ctHead:true})),
+  pt('NT-05','23:04','23:08','23:12', 69,'M',3,
+    'Sudden severe back and abdominal pain, known abdominal aortic aneurysm on record, pulsatile epigastric mass palpable — ruptured AAA until proven otherwise',
+    'code2', {tempF:98.2, hr:118, rr:18, sbp:86, dbp:54, spo2:97, pain:9}, im({ctAb:true,ctContrast:true})),
+  pt('NT-06','23:22','23:35','23:44', 55,'M',3,
+    'Shortness of breath, palpitations, pleuritic chest pain — SpO2 91% on room air, recent long-haul flight, presenting as anxiety',
+    'walk-in', {tempF:98.8, hr:116, rr:26, sbp:128, dbp:80, spo2:91, pain:2}, im({ctpa:true})),
+];
+const NOTES_NIGHT = {
+  'NT-01': '61F, "GI bug x3d" — but diffuse abd tenderness, pain out of proportion to exam, peritonism. Afib hx. Lactate 4.2. Mesenteric ischemia high on differential. CT abd/pelvis c contrast — r/o bowel ischemia, assess mesenteric vasculature.',
+  'NT-02': '48M, syncopal episode at work restroom, preceded by diaphoresis + chest tightness. Troponin pending. EKG: nonspecific ST changes, no acute STE. ACS vs. vasovagal. Serial troponins q3h ordered. Cardiology aware.',
+  'NT-03': '76F, presented as "leg swelling" — SpO2 93% RA, HR 112, RR 22, pleuritic CP. Wells 5 (high probability). R leg pitting edema, possible DVT. Lovenox held pending imaging. CTPA — r/o PE, assess clot burden.',
+  'NT-04': '24F, sudden severe HA onset during exercise — "worst headache of my life." No prior HA hx. HTN 152/88. SAH must be excluded. CT head — r/o subarachnoid hemorrhage. LP planned if CT negative.',
+  'NT-05': '69M, "threw out my back" — but known AAA on chart, pulsatile epigastric mass on exam, BP 86/54, HR 118. Ruptured AAA until proven otherwise. Vascular surgery called. CT abd/pelvis c contrast STAT — confirm rupture, assess extent.',
+  'NT-06': '55M, "panic attack" — SpO2 91% RA, HR 116, RR 26, pleuritic CP. Long-haul flight 2d ago. Wells 4. PE must be excluded urgently. CTPA — r/o pulmonary embolism, assess clot burden and RV strain.',
+};
+
+const SCENARIOS = {
+  trauma:    { data: DEMO_TRAUMA,    notes: NOTES_TRAUMA    },
+  afternoon: { data: DEMO_AFTERNOON, notes: NOTES_AFTERNOON },
+  night:     { data: DEMO_NIGHT,     notes: NOTES_NIGHT     },
+};
+
+function loadScenario(id) {
+  const key = id || (document.getElementById('scenarioSelect') || {}).value || 'afternoon';
+  const scenario = SCENARIOS[key];
+  if (!scenario) return;
+  if (patients.length && !confirm('Loading a scenario will replace all ' + patients.length + ' current patient' + (patients.length === 1 ? '' : 's') + '. Continue?')) return;
+  posAnalysis = {}; analysisPending = {}; expandedCards = new Set();
+  physNotes = Object.assign({}, scenario.notes);
+  patients = scenario.data.map(p => ({
+    ...p,
+    arrivalTimestamp: ts(p.arrivalTime),
+    admissionTimestamp: p.admissionTime ? ts(p.admissionTime) : null,
+    imagingOrderedTimestamp: p.imagingOrderedTime ? ts(p.imagingOrderedTime) : null,
+  }));
   renderAll();
 }
 
 function clearAll() {
+  if (!patients.length) return;
+  if (!confirm('Clear all ' + patients.length + ' patient' + (patients.length === 1 ? '' : 's') + ' from the queue? This cannot be undone.')) return;
   patients = []; posAnalysis = {}; analysisPending = {}; physNotes = {}; expandedCards = new Set(); rankedOrder = [];
   renderAll();
+}
+
+function deletePatient(id) {
+  if (!confirm('Remove ' + id + ' from the queue?')) return;
+  patients = patients.filter(p => p.id !== id);
+  delete posAnalysis[id]; delete analysisPending[id]; delete physNotes[id];
+  expandedCards.delete(id);
+  rankedOrder = rankedOrder.filter(p => p.id !== id);
+  renderAll();
+}
+
+function scrollToAI(id) {
+  const safeId = id.replace(/\W/g,'_');
+  const card = document.getElementById('aic-' + safeId);
+  if (!card) return;
+  card.scrollIntoView({behavior:'smooth', block:'nearest'});
+  if (!expandedCards.has(id)) toggleCard(id);
+  card.classList.add('highlight-flash');
+  setTimeout(() => card.classList.remove('highlight-flash'), 1100);
+}
+
+function toggleAllCards() {
+  const btn = document.getElementById('expandAllBtn');
+  const anyCollapsed = rankedOrder.some(p => !expandedCards.has(p.id));
+  rankedOrder.forEach(p => {
+    if (anyCollapsed) expandedCards.add(p.id); else expandedCards.delete(p.id);
+  });
+  if (btn) btn.textContent = anyCollapsed ? 'Collapse All' : 'Expand All';
+  renderAll();
+}
+
+function updateWaitBadges() {
+  document.querySelectorAll('.wait-badge').forEach(el => {
+    const arrive = parseInt(el.dataset.arrive, 10);
+    if (!arrive) return;
+    const min = Math.round((Date.now() - arrive) / 60000);
+    el.textContent = '⏱ ' + (min < 1 ? '<1 min' : min + ' min');
+  });
 }
 
 // ════════════════════════════════════════════════════
@@ -1161,8 +1432,9 @@ function openPanel() {
   document.getElementById('addPanel').classList.add('open');
   const n = patients.length + 1;
   document.getElementById('f_id').value = `PT-${String(n).padStart(3,'0')}`;
-  const now = new Date();
-  document.getElementById('f_arr').value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('f_arr').value = '';
+  document.getElementById('f_adm').value = '';
+  document.getElementById('f_img_time').value = '';
 }
 
 function closePanel() {
@@ -1174,7 +1446,13 @@ function g(id) { return document.getElementById(id); }
 function gv(id) { return g(id).value; }
 
 function submitPatient() {
+  const newId = gv('f_id').trim();
+  if (!newId) { alert('Patient ID is required.'); return; }
+  if (patients.some(p => p.id === newId)) { alert('A patient with ID "' + newId + '" already exists. Use a unique ID.'); return; }
   const arr = gv('f_arr');
+  if (!arr) { alert('Arrival time is required.'); return; }
+  const adm = gv('f_adm');
+  const imgT = gv('f_img_time');
   const age = gv('f_age') !== '' ? parseFloat(gv('f_age')) : null;
   const spo2v = parseFloat(gv('f_spo2'));
   const hrv = parseInt(gv('f_hr')); const rrv = parseInt(gv('f_rr'));
@@ -1182,14 +1460,21 @@ function submitPatient() {
   const painv = gv('f_pain') !== '' ? parseInt(gv('f_pain')) : null;
   const tempv = gv('f_temp') !== '' ? parseFloat(gv('f_temp')) : null;
 
+  const noteVal = gv('f_notes').trim();
+  if (noteVal) physNotes[newId] = noteVal;
+
   patients.push({
-    id: gv('f_id').trim() || `PT-${Date.now()}`,
+    id: newId,
     arrivalTime: arr,
     arrivalTimestamp: arr ? ts(arr) : Date.now(),
+    admissionTime: adm || null,
+    admissionTimestamp: adm ? ts(adm) : null,
+    imagingOrderedTime: imgT || null,
+    imagingOrderedTimestamp: imgT ? ts(imgT) : null,
     age, sex: gv('f_sex') || null,
     esiLevel: gv('f_esi') ? parseInt(gv('f_esi')) : null,
     chiefComplaints: gv('f_complaint').trim() ? [gv('f_complaint').trim()] : [],
-    arrivedByAmbulance: gv('f_amb') === 'true',
+    transportCode: gv('f_tc'),
     vitals: {
       tempF: tempv, hr: isNaN(hrv)?null:hrv, rr: isNaN(rrv)?null:rrv,
       sbp: isNaN(sbpv)?null:sbpv, dbp: isNaN(dbpv)?null:dbpv,
@@ -1203,7 +1488,8 @@ function submitPatient() {
   });
 
   closePanel();
-  ['f_complaint'].forEach(id => g(id).value = '');
+  ['f_complaint','f_notes'].forEach(id => g(id).value = '');
+  ['f_adm','f_img_time'].forEach(id => g(id).value = '');
   document.querySelectorAll('#addPanel input[type=checkbox]').forEach(cb => cb.checked = false);
   document.querySelectorAll('#addPanel input[type=number]').forEach(inp => inp.value = '');
   document.querySelectorAll('#addPanel select').forEach(sel => sel.selectedIndex = 0);
@@ -1230,8 +1516,341 @@ g('apiKey').addEventListener('input', function() {
 });
 
 // ════════════════════════════════════════════════════
+//  LOGIN
+// ════════════════════════════════════════════════════
+
+function enterApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+function doLogin() {
+  const user = document.getElementById('l_user').value.trim();
+  const pass = document.getElementById('l_pass').value;
+  const err = document.getElementById('l_err');
+  if (!user || !pass) {
+    err.textContent = 'Please enter your username and password.';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  enterApp();
+}
+
+function enterDemo() {
+  enterApp();
+  loadScenario('afternoon');
+}
+
+['l_user','l_pass'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+});
+
+// ════════════════════════════════════════════════════
+//  SYMPTOMS AUTOCOMPLETE DATASET
+// ════════════════════════════════════════════════════
+
+const SYMPTOMS=[
+  // General/Constitutional
+  {c:"Fever",a:["high temperature","febrile","pyrexia","running a fever","feverish","hyperthermia"],m:["feve","fevere","fver","fevar"],s:"General",t:["common"]},
+  {c:"Chills",a:["rigors","shivering","shaking chills","feeling cold"],m:["chils","chilles"],s:"General"},
+  {c:"Fatigue",a:["tiredness","exhaustion","run down","no energy","lethargy","worn out"],m:["fatige","fatigu"],s:"General",t:["common"]},
+  {c:"General weakness",a:["weakness all over","generalized weakness","malaise","not feeling well","sick","general ill feeling"],m:["weekness","weaknes","waekness"],s:"General",t:["common"]},
+  {c:"Diaphoresis",a:["sweating","excessive sweating","cold sweats","profuse sweating","drenching sweats","night sweats"],m:["diaphorsis","diaphorresis"],s:"General",t:["high-acuity"]},
+  {c:"Syncope",a:["fainting","passed out","blacked out","loss of consciousness","LOC","fainted","passing out","blackout","fainting spell"],m:["synkope","sincope","syncoupe","snycope"],s:"General",t:["high-acuity"]},
+  {c:"Edema",a:["swelling","bilateral leg swelling","peripheral edema","pitting edema","fluid retention","ankles swelling","legs swollen","bloated"],m:["oedema","edma","edemma"],s:"General"},
+  {c:"Jaundice",a:["yellow skin","yellow eyes","yellowing","icterus","scleral icterus"],m:["jandice","jaundise","joundice"],s:"General"},
+  {c:"Pallor",a:["pale skin","paleness","looking pale","whitish skin","ashen"],m:["pallour","palor"],s:"General"},
+  {c:"Weight loss",a:["losing weight","unintentional weight loss","recent weight loss"],m:["wieght loss","wt loss","weigh loss"],s:"General"},
+  {c:"Dehydration",a:["dry mouth","not drinking","fluid loss","thirsty","sunken fontanel"],m:["dehydartion","dehydraton"],s:"General"},
+  {c:"Excessive thirst",a:["polydipsia","always thirsty","drinking a lot","increased thirst"],m:["thurst","thirsy"],s:"General"},
+  // Neurological
+  {c:"Headache",a:["head pain","head hurts","migraine","cephalgia","thunderclap headache","worst headache of life","head pressure","head pounding"],m:["hedache","headach","headace","head ache"],s:"Neurological",t:["common","high-acuity"]},
+  {c:"Sudden severe headache",a:["thunderclap headache","worst headache of life","explosive headache","headache at onset","sentinel headache"],m:["sudden hedache"],s:"Neurological",t:["critical","high-acuity"]},
+  {c:"Facial droop",a:["drooping face","facial asymmetry","face drooping","unilateral facial weakness","drooping mouth","facial paralysis"],m:["facial drupe","facail droop"],s:"Neurological",t:["stroke","critical"]},
+  {c:"Arm weakness",a:["arm drift","unilateral arm weakness","can't lift arm","upper extremity weakness","hemiplegia","arm not working"],m:["arm weekness","arm waekness"],s:"Neurological",t:["stroke","critical"]},
+  {c:"Slurred speech",a:["dysarthria","speech slurred","trouble speaking","garbled speech","speech difficulty","speech problem"],m:["slured speech","slurrd speech","sluured speech"],s:"Neurological",t:["stroke","critical"]},
+  {c:"Aphasia",a:["can't speak","speech loss","word finding difficulty","unable to speak","expressive aphasia","receptive aphasia","not making sense"],m:["afasia","apahsia"],s:"Neurological",t:["stroke","critical"]},
+  {c:"Hemiplegia",a:["one-sided paralysis","half body paralysis","unilateral paralysis","side paralysis"],m:["hemipelegia","hemiplesia"],s:"Neurological",t:["stroke","critical"]},
+  {c:"Hemiparesis",a:["one-sided weakness","unilateral weakness","half body weakness","contralateral weakness"],m:["hemiparasis"],s:"Neurological",t:["stroke"]},
+  {c:"Gaze deviation",a:["eyes deviated","eyes looking to one side","forced gaze","conjugate gaze deviation"],m:[],s:"Neurological",t:["stroke","critical"]},
+  {c:"Altered mental status",a:["AMS","confusion","disoriented","altered consciousness","not acting right","encephalopathy","delirium","disorientation","confused"],m:["altered mentol status","alterd mental status"],s:"Neurological",t:["high-acuity","common"]},
+  {c:"Lethargy",a:["lethargic","difficult to arouse","sleepy","somnolent","hard to wake up","excessive sleepiness"],m:["lethergy"],s:"Neurological",t:["high-acuity"]},
+  {c:"Loss of consciousness",a:["LOC","unconscious","unresponsive","blacked out","knocked out","passed out"],m:["loss of conciousness","unconcious","unconsious"],s:"Neurological",t:["critical"]},
+  {c:"Seizure",a:["convulsion","shaking episode","fit","grand mal","tonic clonic","seizure activity","epileptic episode"],m:["siezure","seisure","seizuer"],s:"Neurological",t:["critical"]},
+  {c:"Dizziness",a:["dizzy","lightheadedness","light headed","feeling faint","near syncope","pre-syncope","unsteady"],m:["dizzines","dizyness"],s:"Neurological",t:["common"]},
+  {c:"Vertigo",a:["room spinning","spinning sensation","vestibular","dizziness with movement","positional dizziness"],m:["vertego","vertago"],s:"Neurological"},
+  {c:"Ataxia",a:["balance problems","unsteady gait","can't walk straight","coordination problems","loss of balance","stumbling","incoordination"],m:[],s:"Neurological",t:["stroke"]},
+  {c:"Diplopia",a:["double vision","seeing double","binocular diplopia"],m:["diplopea","diploipa"],s:"Neurological",t:["stroke"]},
+  {c:"Dysphagia",a:["difficulty swallowing","can't swallow","trouble swallowing","choking on food","inability to swallow","food getting stuck"],m:["dyspaghia","dyspahgia"],s:"Neurological"},
+  {c:"Neck stiffness",a:["stiff neck","meningismus","nuchal rigidity","neck pain with bending"],m:["neck stifness","stiff nec"],s:"Neurological",t:["high-acuity"]},
+  {c:"Numbness",a:["tingling","paresthesia","pins and needles","loss of sensation","sensory loss","numbness and tingling","hemibody numbness"],m:["numbnes","numness"],s:"Neurological",t:["common"]},
+  {c:"Photophobia",a:["light sensitivity","sensitive to light","can't stand light","eyes hurt in light"],m:["photofobia"],s:"Neurological"},
+  {c:"Phonophobia",a:["noise sensitivity","sound sensitivity","sensitive to sound"],m:["phonofobia"],s:"Neurological"},
+  {c:"Saddle anesthesia",a:["perineal numbness","genital numbness","inner thigh numbness","saddle area numbness"],m:[],s:"Neurological",t:["cauda equina","critical"]},
+  {c:"Horner syndrome",a:["ptosis miosis anhidrosis","drooping eyelid with small pupil","Horner's"],m:["horners syndrome"],s:"Neurological",t:["dissection"]},
+  {c:"Papilledema",a:["optic disc swelling","raised ICP signs","blurred optic disc"],m:["papilodema"],s:"Neurological",t:["high-acuity"]},
+  {c:"Nystagmus",a:["eye twitching","eyes bouncing","abnormal eye movements","jerking eye movements"],m:["nistagmus"],s:"Neurological"},
+  // Cardiovascular
+  {c:"Chest pain",a:["chest discomfort","chest pressure","chest tightness","chest heaviness","substernal pain","precordial pain","crushing chest pain","squeezing chest pain"],m:["chest paim","chestpain","chets pain"],s:"Cardiovascular",t:["common","critical","high-acuity"]},
+  {c:"Chest pressure",a:["pressure in chest","chest squeeze","heaviness in chest","elephant on chest"],m:["chest presure","chest pressur"],s:"Cardiovascular",t:["high-acuity"]},
+  {c:"Palpitations",a:["heart racing","heart fluttering","heart pounding","rapid heartbeat","irregular heartbeat","fast heart rate","skipped beats","heart skipping"],m:["palpitaions","palpatations"],s:"Cardiovascular",t:["common"]},
+  {c:"Tachycardia",a:["fast heart rate","rapid pulse","elevated heart rate","racing heart","rapid HR"],m:["tacycardia","tachycarida","tahycardia"],s:"Cardiovascular",t:["high-acuity"]},
+  {c:"Bradycardia",a:["slow heart rate","low pulse","slow pulse","slow HR"],m:["bradycarida","braycardia"],s:"Cardiovascular"},
+  {c:"Hypotension",a:["low blood pressure","low BP","BP drop","hemodynamic instability"],m:["hypotensoin"],s:"Cardiovascular",t:["critical"]},
+  {c:"Hypertension",a:["high blood pressure","elevated BP","high BP","hypertensive"],m:["hypertensoin","hypertenshion"],s:"Cardiovascular"},
+  {c:"Tearing chest pain",a:["ripping chest pain","tearing back pain","tearing sensation","aortic dissection pain","ripping pain radiating to back"],m:["tearing chets pain"],s:"Cardiovascular",t:["critical","aortic dissection"]},
+  {c:"Jugular venous distension",a:["JVD","neck vein distension","elevated JVP","bulging neck veins"],m:[],s:"Cardiovascular",t:["high-acuity"]},
+  {c:"Leg pain with swelling",a:["DVT symptoms","deep vein thrombosis","calf pain","leg clot","unilateral leg swelling"],m:["leg sweling"],s:"Cardiovascular",t:["DVT","PE"]},
+  {c:"Absent distal pulse",a:["no pulse in foot","missing pulse","pulseless extremity","absent femoral pulse"],m:[],s:"Cardiovascular",t:["critical"]},
+  {c:"Cool extremities",a:["cold hands","cold feet","cold extremities","cold limbs","mottled skin","poor perfusion"],m:["cool extremeties"],s:"Cardiovascular",t:["shock"]},
+  {c:"Left arm pain",a:["left arm ache","arm radiation","radiating to left arm","left shoulder pain","left arm discomfort"],m:["lft arm pain"],s:"Cardiovascular",t:["ACS"]},
+  {c:"Jaw pain",a:["jaw ache","pain in jaw","mandibular pain","TMJ pain"],m:[],s:"Cardiovascular",t:["ACS atypical"]},
+  {c:"Orthopnea",a:["can't breathe lying down","shortness of breath lying flat","must sleep upright","breathless when supine"],m:["orthopnia"],s:"Cardiovascular",t:["heart failure"]},
+  {c:"Paroxysmal nocturnal dyspnea",a:["PND","waking up short of breath","nighttime breathlessness","awakening with dyspnea"],m:[],s:"Cardiovascular",t:["heart failure"]},
+  // Pulmonary
+  {c:"Shortness of breath",a:["dyspnea","SOB","difficulty breathing","breathlessness","can't breathe","air hunger","trouble breathing","respiratory distress","out of breath","gasping"],m:["shortnes of breath","soreness of breath"],s:"Pulmonary",t:["common","high-acuity"]},
+  {c:"Dyspnea on exertion",a:["DOE","shortness of breath with activity","breathlessness with exertion","exercise-induced dyspnea"],m:["dyspnea on exersion"],s:"Pulmonary"},
+  {c:"Cough",a:["coughing","productive cough","dry cough","chronic cough","persistent cough","smoker's cough","croupy cough"],m:["couch","cuf","caugh"],s:"Pulmonary",t:["common"]},
+  {c:"Hemoptysis",a:["coughing up blood","blood in sputum","blood in phlegm","bloody cough","spitting blood"],m:["hemoptesis"],s:"Pulmonary",t:["high-acuity"]},
+  {c:"Wheezing",a:["whistling breath","wheeze","expiratory wheeze","asthma attack","bronchospasm"],m:["weezing","wheizing"],s:"Pulmonary",t:["common"]},
+  {c:"Stridor",a:["noisy breathing","high-pitched breathing","inspiratory stridor","crowing respirations"],m:["strider"],s:"Pulmonary",t:["critical"]},
+  {c:"Pleuritic chest pain",a:["sharp chest pain with breathing","pain worse with breathing","pain on inhalation","pleural pain"],m:["pleurtic chest pain"],s:"Pulmonary",t:["PE","pneumonia"]},
+  {c:"Tachypnea",a:["rapid breathing","fast breathing","increased respiratory rate","hyperventilation"],m:["tachypnia","techypnea"],s:"Pulmonary",t:["high-acuity"]},
+  {c:"Hypoxia",a:["low oxygen","low O2 sat","oxygen desaturation","low saturation","O2 sat drop"],m:["hypoxya","hypoxeia"],s:"Pulmonary",t:["critical"]},
+  {c:"Tracheal deviation",a:["tracheal shift","deviated trachea","midline trachea shift"],m:["tracheal devation"],s:"Pulmonary",t:["tension pneumothorax","critical"]},
+  {c:"Drooling",a:["excessive drooling","sialorrhea","can't swallow saliva"],m:["droolong"],s:"Pulmonary",t:["epiglottitis","airway","critical"]},
+  {c:"Intercostal retractions",a:["retractions","accessory muscle use","chest retractions","sucking in between ribs"],m:[],s:"Pulmonary",t:["respiratory distress"]},
+  {c:"Nasal flaring",a:["flaring nostrils","nasal alar flaring","alar flaring"],m:[],s:"Pulmonary",t:["respiratory distress","pediatric"]},
+  // Gastrointestinal
+  {c:"Abdominal pain",a:["stomach pain","belly pain","stomach ache","abdominal cramps","tummy pain","gastric pain","intestinal colic"],m:["abdominal paim","abd pain","stomack pain"],s:"Gastrointestinal",t:["common","high-acuity"]},
+  {c:"Right lower quadrant pain",a:["RLQ pain","right side lower abdomen","right lower abdomen","appendicitis pain","McBurney's point pain"],m:[],s:"Gastrointestinal",t:["appendicitis"]},
+  {c:"Left lower quadrant pain",a:["LLQ pain","left lower abdomen","left side lower abdomen"],m:[],s:"Gastrointestinal"},
+  {c:"Right upper quadrant pain",a:["RUQ pain","right upper abdomen","gallbladder pain","liver pain"],m:[],s:"Gastrointestinal",t:["cholecystitis"]},
+  {c:"Left upper quadrant pain",a:["LUQ pain","left upper abdomen","spleen pain"],m:[],s:"Gastrointestinal"},
+  {c:"Periumbilical pain",a:["pain around navel","belly button pain","umbilical pain","pain near navel"],m:["periumbliical"],s:"Gastrointestinal",t:["appendicitis"]},
+  {c:"Nausea",a:["feel like throwing up","nauseated","queasy","sick to stomach","upset stomach","nervous stomach"],m:["nausua","nasuea","nasea"],s:"Gastrointestinal",t:["common"]},
+  {c:"Vomiting",a:["throwing up","emesis","retching","dry heaves","can't keep food down","gagging","puking"],m:["vomitting","vomitng","vomting"],s:"Gastrointestinal",t:["common"]},
+  {c:"Hematemesis",a:["vomiting blood","blood in vomit","bloody vomit","coffee ground emesis","bright red blood in vomit"],m:["hematemisis"],s:"Gastrointestinal",t:["critical"]},
+  {c:"Diarrhea",a:["loose stools","watery stool","frequent stools","liquid stool","frequent bowel movements"],m:["diarrhia","diarea","diarreha"],s:"Gastrointestinal",t:["common"]},
+  {c:"Constipation",a:["unable to have bowel movement","hard stools","no BM","straining to defecate"],m:["constipaiton"],s:"Gastrointestinal"},
+  {c:"Melena",a:["dark stools","black tarry stools","blood in stool","dark tarry stool","tarry stool"],m:["melana","melaina"],s:"Gastrointestinal",t:["GI bleed","critical"]},
+  {c:"Bright red blood per rectum",a:["BRBPR","rectal bleeding","blood in stool","bloody stool","hematochezia"],m:["rectal bleed"],s:"Gastrointestinal",t:["GI bleed","critical"]},
+  {c:"Abdominal distension",a:["bloated abdomen","distended abdomen","swollen belly","abdominal bloating","gaseous distension"],m:["abdominal distention"],s:"Gastrointestinal"},
+  {c:"Obstipation",a:["inability to pass gas or stool","no bowel sounds","cannot pass stool","no flatus"],m:["obstipaion"],s:"Gastrointestinal",t:["bowel obstruction"]},
+  {c:"Rebound tenderness",a:["peritoneal signs","rebound","pain with release","guarding","guarding abdomen"],m:[],s:"Gastrointestinal",t:["peritonitis","high-acuity"]},
+  {c:"Rigid abdomen",a:["board-like abdomen","abdominal rigidity","tense abdomen"],m:["rigid abd"],s:"Gastrointestinal",t:["perforation","peritonitis","critical"]},
+  {c:"Anorexia",a:["loss of appetite","not eating","not hungry","decreased appetite","no appetite"],m:["anoreksia"],s:"Gastrointestinal"},
+  {c:"Heartburn",a:["acid reflux","indigestion","dyspepsia","acid in stomach","GERD","burning in chest after eating"],m:["heartbern"],s:"Gastrointestinal"},
+  {c:"Flank pain",a:["side pain","loin pain","costovertebral angle tenderness","CVA tenderness","side ache","kidney pain"],m:["flank paim"],s:"Gastrointestinal",t:["renal colic","pyelonephritis"]},
+  {c:"Colicky abdominal pain",a:["crampy abdominal pain","intermittent abdominal pain","wave-like pain","spasmodic pain"],m:["colicy pain"],s:"Gastrointestinal"},
+  {c:"Right shoulder pain",a:["shoulder tip pain","referred shoulder pain","Kehr's sign","diaphragmatic irritation"],m:[],s:"Gastrointestinal",t:["splenic rupture","liver laceration"]},
+  // Genitourinary
+  {c:"Dysuria",a:["painful urination","burning with urination","burning pee","pain when peeing","discomfort urinating"],m:["disuria"],s:"Genitourinary",t:["UTI"]},
+  {c:"Hematuria",a:["blood in urine","bloody urine","pink urine","red urine","blood in pee"],m:["haematuria"],s:"Genitourinary",t:["high-acuity"]},
+  {c:"Urinary frequency",a:["frequent urination","going a lot","urinating a lot","polyuria","nocturia"],m:[],s:"Genitourinary"},
+  {c:"Urinary urgency",a:["can't hold urine","sudden urge to urinate","urinary incontinence","can't make it to bathroom"],m:[],s:"Genitourinary"},
+  {c:"Urinary retention",a:["can't urinate","unable to void","retention","can't pee","no urine output"],m:["urinary rentention","urine retention"],s:"Genitourinary",t:["high-acuity"]},
+  {c:"Testicular pain",a:["scrotal pain","testicle pain","testicular torsion symptoms","sudden scrotal pain"],m:["testicular paim","testicle paim"],s:"Genitourinary",t:["torsion","critical"]},
+  {c:"Scrotal swelling",a:["swollen testicle","swollen scrotum","testicular swelling","scrotal mass"],m:["scrotal sweling"],s:"Genitourinary"},
+  {c:"Vaginal bleeding",a:["abnormal vaginal bleeding","vaginal hemorrhage","heavy periods","menorrhagia","intermenstrual bleeding","bleeding from vagina"],m:["vaginal bleding"],s:"Genitourinary",t:["gynecologic","high-acuity"]},
+  {c:"Pelvic pain",a:["pelvic cramps","lower pelvic pain","suprapubic pain","pelvic discomfort"],m:["pelvic paim"],s:"Genitourinary",t:["gynecologic","ectopic"]},
+  // OB/GYN
+  {c:"Ectopic pregnancy symptoms",a:["ruptured ectopic","lower quadrant pain pregnant","missed period with pain","positive pregnancy with pain"],m:["ectopic pregancy"],s:"OB/GYN",t:["critical"]},
+  {c:"Vaginal bleeding in pregnancy",a:["bleeding while pregnant","antepartum hemorrhage","spotting in pregnancy","placenta previa bleeding","abruption bleeding"],m:["vaginal bleding pregnancy"],s:"OB/GYN",t:["critical"]},
+  {c:"Postpartum bleeding",a:["heavy bleeding after delivery","postpartum hemorrhage","bleeding after birth","PPH"],m:["postpartum bleding"],s:"OB/GYN",t:["critical"]},
+  {c:"Shoulder tip pain in pregnancy",a:["diaphragmatic irritation pregnant","ectopic shoulder pain"],m:[],s:"OB/GYN",t:["ectopic","critical"]},
+  // ENT
+  {c:"Sore throat",a:["throat pain","throat hurts","pharyngitis","raw throat","throat infection","throat burning"],m:["sore throte","sore troat","throte pain"],s:"ENT",t:["common"]},
+  {c:"Earache",a:["ear pain","otalgia","ear infection","ear hurts"],m:["ear ache","earach"],s:"ENT",t:["common"]},
+  {c:"Ear discharge",a:["drainage from ear","ear drainage","otorrhea","fluid from ear","pus in ear"],m:["ear discharg"],s:"ENT"},
+  {c:"Epistaxis",a:["nosebleed","bleeding from nose","nasal bleeding","nose bleed"],m:["noseblede"],s:"ENT",t:["high-acuity"]},
+  {c:"Nasal congestion",a:["stuffy nose","runny nose","nasal discharge","post-nasal drip","congested","blocked nose"],m:[],s:"ENT"},
+  {c:"Tinnitus",a:["ringing in ears","buzzing in ears","ear ringing","ear noise"],m:["tinitus"],s:"ENT"},
+  {c:"Hearing loss",a:["decreased hearing","hard of hearing","deafness","hearing difficulty","can't hear"],m:["hearig loss"],s:"ENT"},
+  {c:"Neck swelling",a:["neck mass","swollen neck","neck lymphadenopathy","lymph node swelling in neck","neck lump"],m:["neck sweling"],s:"ENT",t:["high-acuity"]},
+  {c:"Trismus",a:["jaw lock","can't open mouth","locked jaw","jaw spasm"],m:["locked jaw"],s:"ENT",t:["peritonsillar abscess"]},
+  {c:"Hot potato voice",a:["muffled voice","muffled speech","abnormal voice quality","plummy voice"],m:["muffled voic"],s:"ENT",t:["peritonsillar abscess","epiglottitis"]},
+  {c:"Hoarseness",a:["raspy voice","loss of voice","croaky voice","voice change","dysphonia"],m:["hoarness","horseness"],s:"ENT"},
+  // Ophthalmologic
+  {c:"Eye pain",a:["ocular pain","eye hurts","eye ache","painful eye","orbital pain"],m:["eye paim"],s:"Ophthalmologic",t:["common","high-acuity"]},
+  {c:"Visual loss",a:["vision loss","can't see","blindness","loss of vision","blurry vision","visual field deficit","amaurosis fugax","scotoma"],m:["vision los","blury vision"],s:"Ophthalmologic",t:["critical"]},
+  {c:"Sudden monocular blindness",a:["sudden vision loss one eye","painless vision loss","central retinal artery occlusion","amaurosis fugax","transient visual loss one eye"],m:["monocular blindnes"],s:"Ophthalmologic",t:["stroke","critical"]},
+  {c:"Red eye",a:["conjunctival injection","bloodshot eye","eye redness","inflamed eye"],m:["red aye"],s:"Ophthalmologic"},
+  {c:"Eye discharge",a:["eye drainage","pus from eye","matted eye","tearing","watery eye"],m:["eye discharg"],s:"Ophthalmologic"},
+  {c:"Halos around lights",a:["halo vision","seeing halos","light halos","colored rings around lights"],m:[],s:"Ophthalmologic",t:["glaucoma","high-acuity"]},
+  {c:"Unequal pupils",a:["anisocoria","different sized pupils","one pupil larger","unequal pupil size"],m:[],s:"Ophthalmologic",t:["herniation","critical"]},
+  {c:"Floaters",a:["spots in vision","floaters in eye","moving spots","vitreous floaters","black spots in vision"],m:["flotters"],s:"Ophthalmologic"},
+  {c:"Proptosis",a:["bulging eye","eye protruding","exophthalmos","eyes bulging out"],m:["exophtalmos"],s:"Ophthalmologic",t:["high-acuity"]},
+  // Musculoskeletal
+  {c:"Back pain",a:["backache","lumbar pain","lower back pain","upper back pain","spinal pain","spine pain","back ache"],m:["back paim","bakc pain"],s:"Musculoskeletal",t:["common"]},
+  {c:"Lower back pain",a:["lumbar pain","lumbago","low back pain","LBP","lumbar ache"],m:["lower back paim"],s:"Musculoskeletal",t:["common"]},
+  {c:"Neck pain",a:["cervical pain","neck ache","stiff neck","cervicalgia","posterior neck pain"],m:["neck paim"],s:"Musculoskeletal",t:["common","dissection"]},
+  {c:"Joint pain",a:["arthralgia","joint ache","joint swelling","swollen joint","painful joint"],m:["joint paim"],s:"Musculoskeletal",t:["common"]},
+  {c:"Hip pain",a:["hip ache","pain in hip","hip discomfort"],m:["hip paim"],s:"Musculoskeletal"},
+  {c:"Knee pain",a:["pain in knee","knee ache","knee swelling","knee injury"],m:["knee paim","nee pain"],s:"Musculoskeletal"},
+  {c:"Shoulder pain",a:["pain in shoulder","shoulder ache","shoulder discomfort","rotator cuff pain"],m:["shoulder paim"],s:"Musculoskeletal"},
+  {c:"Inability to bear weight",a:["can't walk","can't stand","unable to walk","unable to bear weight","non-weight bearing"],m:["cant walk"],s:"Musculoskeletal",t:["fracture","high-acuity"]},
+  {c:"Midline spinal tenderness",a:["spine tenderness","vertebral tenderness","midline back tenderness","percussion tenderness spine"],m:[],s:"Musculoskeletal",t:["MSCC","high-acuity"]},
+  {c:"Back pain worse at rest",a:["back pain lying down","back pain worse at night","back pain worse with recumbency"],m:[],s:"Musculoskeletal",t:["malignancy","high-acuity"]},
+  // Trauma
+  {c:"Head trauma",a:["head injury","blow to head","TBI","traumatic brain injury","struck on head","hit in head"],m:["head injry"],s:"Trauma",t:["high-acuity"]},
+  {c:"Laceration",a:["cut","wound","slash","deep cut","open wound"],m:["laserasion"],s:"Trauma",t:["common"]},
+  {c:"Contusion",a:["bruise","bruising","black and blue","ecchymosis"],m:["contuison"],s:"Trauma"},
+  {c:"Fracture",a:["broken bone","broken arm","broken leg","fx","bone fracture"],m:["fractur","fractrue","frakture"],s:"Trauma",t:["common"]},
+  {c:"Abdominal trauma",a:["belly injury","abdominal injury","blunt abdominal trauma","BAT","seat belt sign"],m:["abd trauma"],s:"Trauma",t:["high-acuity"]},
+  {c:"Pelvic pain after trauma",a:["pelvic trauma","pelvis injury","pelvic fracture","pelvic instability"],m:[],s:"Trauma",t:["critical"]},
+  {c:"Loss of consciousness after trauma",a:["LOC with trauma","knocked out","head injury with blackout","post-traumatic LOC"],m:["loss of conciousness"],s:"Trauma",t:["critical"]},
+  {c:"Spinal injury",a:["back trauma","cervical spine injury","spine injury","cord injury","spinal cord injury"],m:["spinal injry"],s:"Trauma",t:["critical"]},
+  {c:"Burn",a:["burn injury","thermal burn","fire burn","chemical burn","scalded"],m:["brun"],s:"Trauma"},
+  // Psychiatric
+  {c:"Suicidal ideation",a:["suicidal","wants to kill self","thinking about suicide","SI","suicidal thoughts","self-harm intent","wants to die"],m:[],s:"Psychiatric",t:["critical"]},
+  {c:"Agitation",a:["combative","aggressive","violent","hostile","agitated","restless","disruptive"],m:["agitaiton"],s:"Psychiatric",t:["high-acuity"]},
+  {c:"Psychosis",a:["hallucinations","hearing voices","paranoia","delusions","not in touch with reality","psychotic"],m:["pschosis"],s:"Psychiatric"},
+  {c:"Anxiety",a:["panic attack","anxious","overwhelming anxiety","panic","hyperventilation anxiety"],m:["anxity"],s:"Psychiatric"},
+  {c:"Depression",a:["depressed","feeling hopeless","feeling down","sadness","low mood"],m:["depresion"],s:"Psychiatric"},
+  // Infectious
+  {c:"Sepsis",a:["blood infection","systemic infection","septicemia","generalized infection","bacteremia"],m:["sepssis","sepis","sepsas"],s:"Infectious",t:["critical"]},
+  {c:"Cellulitis",a:["skin infection","red streaking skin","spreading redness","skin redness and swelling"],m:["celuitis","celulitis"],s:"Infectious"},
+  {c:"Soft tissue infection",a:["necrotizing fasciitis","gas gangrene","flesh eating","rapidly spreading infection"],m:[],s:"Infectious",t:["critical"]},
+  {c:"Meningismus",a:["neck stiffness","nuchal rigidity","meningitis signs","Kernig sign","Brudzinski sign"],m:["meningism"],s:"Infectious",t:["critical"]},
+  {c:"Petechiae",a:["small red spots","pinpoint rash","non-blanching rash","purpura","blood spots"],m:["petechia","peteche","petichiae"],s:"Infectious",t:["meningococcemia","critical"]},
+  {c:"Rigors",a:["shaking chills","uncontrollable shivering","severe chills","violent shaking"],m:["rigor"],s:"Infectious",t:["sepsis"]},
+  {c:"Wound infection",a:["infected wound","wound with pus","abscess","wound redness","wound drainage"],m:["wound infecton"],s:"Infectious"},
+  // Dermatologic
+  {c:"Rash",a:["skin rash","redness","eruption","hives","urticaria","skin eruption","breakout"],m:["rach"],s:"Dermatologic",t:["common"]},
+  {c:"Urticaria",a:["hives","welts","itchy raised skin","allergic rash"],m:["urticarea"],s:"Dermatologic",t:["anaphylaxis"]},
+  {c:"Cyanosis",a:["blue lips","blue skin","bluish discoloration","perioral cyanosis","cyanotic"],m:["cynanosis"],s:"Dermatologic",t:["critical"]},
+  {c:"Skin itching",a:["pruritis","itching","itchy skin","generalized itch"],m:["prutitus"],s:"Dermatologic"},
+  // Oncologic/Spinal
+  {c:"Bilateral leg weakness",a:["both legs weak","lower extremity weakness","paraparesis","paraplegia"],m:["bilateral leg weekness"],s:"Oncologic/Spinal",t:["MSCC","critical"]},
+  {c:"Bowel dysfunction",a:["loss of bowel control","fecal incontinence","unable to defecate","bowel changes with back pain"],m:["bowel dysfuntion"],s:"Oncologic/Spinal",t:["cauda equina","MSCC","critical"]},
+  {c:"Bladder dysfunction",a:["urinary incontinence","unable to urinate","bladder control loss","retention with back pain"],m:["bladder dysfuntion"],s:"Oncologic/Spinal",t:["cauda equina","MSCC","critical"]},
+  {c:"Pathologic fracture",a:["fracture with cancer","bone metastasis fracture","fracture from cancer"],m:["pathologic fractur"],s:"Oncologic/Spinal",t:["high-acuity"]},
+  // Pediatric
+  {c:"Sunken fontanel",a:["sunken soft spot","depressed fontanelle","dehydration in infant"],m:["sunken fontanelle"],s:"Pediatric",t:["dehydration"]},
+  {c:"Inconsolable crying",a:["non-stop crying","crying won't stop","can't comfort baby","persistent cry"],m:[],s:"Pediatric",t:["high-acuity"]},
+  {c:"Lethargy in infant",a:["listless baby","not responsive infant","infant difficult to arouse","sleepy baby"],m:["listless infant"],s:"Pediatric",t:["high-acuity"]},
+  {c:"Currant jelly stool",a:["bloody mucous stool","red mucous stool","blood and mucus in stool"],m:[],s:"Pediatric",t:["intussusception","critical"]},
+  {c:"Pulling at ears",a:["ear pulling","tugging ears","picking at ears"],m:[],s:"Pediatric",t:["otitis media"]},
+];
+
+// Build flat search index
+const AC_INDEX=[];
+for(const sym of SYMPTOMS){
+  const terms=[sym.c,...(sym.a||[]),...(sym.m||[])];
+  for(const term of terms){ if(term) AC_INDEX.push({term:term.toLowerCase(),canonical:sym.c,system:sym.s,tags:sym.t||[]}); }
+}
+
+function acSearch(q){
+  q=q.toLowerCase().trim();
+  if(q.length<2) return [];
+  const scores=new Map();
+  for(const e of AC_INDEX){
+    const t=e.term;
+    let sc=-1;
+    if(t.includes(q)){
+      sc=t.startsWith(q)?100+(20-Math.min(t.length,20)):70+(20-Math.min(t.indexOf(q),20));
+    } else {
+      for(const w of t.split(/\s+/)){ if(w.startsWith(q)){sc=50;break;} }
+    }
+    if(sc>-1){
+      const prev=scores.get(e.canonical);
+      if(!prev||sc>prev.sc) scores.set(e.canonical,{sc,system:e.system,tags:e.tags});
+    }
+  }
+  return [...scores.entries()].sort((a,b)=>b[1].sc-a[1].sc).slice(0,7)
+    .map(([canonical,{system,tags}])=>({canonical,system,tags}));
+}
+
+let acResults=[], acActiveIdx=-1;
+
+function acGetToken(ta){
+  const before=ta.value.substring(0,ta.selectionStart);
+  const sep=Math.max(before.lastIndexOf(','),before.lastIndexOf('\n'));
+  return before.substring(sep+1).trimStart();
+}
+
+function acShow(results){
+  acResults=results;
+  const list=document.getElementById('ac_list');
+  if(!results.length){list.style.display='none';acActiveIdx=-1;return;}
+  acActiveIdx=-1;
+  list.innerHTML=results.map((r,i)=>{
+    const urgent=r.tags.some(t=>t==='critical'||t==='high-acuity');
+    return '<div class="ac-item" data-idx="'+i+'">'
+      +'<span>'+escHtml(r.canonical)+'</span>'
+      +(urgent?'<span class="ac-dot"></span>':'')
+      +'<span class="ac-system">'+escHtml(r.system)+'</span>'
+      +'</div>';
+  }).join('');
+  list.querySelectorAll('.ac-item').forEach(el=>{
+    el.addEventListener('mousedown',e=>{e.preventDefault();acInsert(parseInt(el.dataset.idx));});
+  });
+  list.style.display='block';
+}
+
+function acInsert(idx){
+  if(idx<0||idx>=acResults.length) return;
+  const canonical=acResults[idx].canonical;
+  const ta=document.getElementById('f_complaint');
+  const val=ta.value, cursor=ta.selectionStart;
+  const before=val.substring(0,cursor);
+  const after=val.substring(cursor).replace(/^[\s,]+/,'');
+  const sep=Math.max(before.lastIndexOf(','),before.lastIndexOf('\n'));
+  const prefix=sep>=0?val.substring(0,sep+1):'';
+  const insert=(prefix.length>0?' ':'')+canonical+', ';
+  ta.value=prefix+insert+after;
+  const pos=(prefix+insert).length;
+  ta.setSelectionRange(pos,pos);
+  document.getElementById('ac_list').style.display='none';
+  acActiveIdx=-1;
+  ta.focus();
+}
+
+const acTA=document.getElementById('f_complaint');
+acTA.addEventListener('input',function(){acShow(acSearch(acGetToken(this)));});
+acTA.addEventListener('keydown',function(e){
+  const list=document.getElementById('ac_list');
+  const items=list.querySelectorAll('.ac-item');
+  if(list.style.display==='none'||!items.length) return;
+  if(e.key==='ArrowDown'){
+    e.preventDefault();
+    acActiveIdx=Math.min(acActiveIdx+1,items.length-1);
+    items.forEach((el,i)=>el.classList.toggle('ac-active',i===acActiveIdx));
+  } else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    acActiveIdx=Math.max(acActiveIdx-1,-1);
+    items.forEach((el,i)=>el.classList.toggle('ac-active',i===acActiveIdx));
+  } else if(e.key==='Enter'&&acActiveIdx>=0){
+    e.preventDefault();
+    acInsert(acActiveIdx);
+  } else if(e.key==='Escape'){
+    list.style.display='none';acActiveIdx=-1;
+  }
+});
+acTA.addEventListener('blur',function(){
+  setTimeout(()=>{document.getElementById('ac_list').style.display='none';acActiveIdx=-1;},150);
+});
+
+// ════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closePanel();
+});
+
+function updateClock() {
+  const el = document.getElementById('liveClock');
+  if (!el) return;
+  const now = new Date();
+  el.textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+updateClock();
+setInterval(updateClock, 1000);
+setInterval(updateWaitBadges, 60000);
+
 renderAll();
 </script>
 </body>
