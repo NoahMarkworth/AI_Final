@@ -331,7 +331,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 <div class="slide content-slide" data-n="2">
   <div class="s-head">
     <div class="s-num" data-a="0">01 · PROBLEM</div>
-    <h2 data-a="1">The Queue Doesn't Know Who's Dying</h2>
+    <h2 data-a="1">The Queue Doesn't Know Who's At Risk</h2>
     <div class="sub" data-a="2">Nebraska Medicine's imaging queue runs on first-come, first-served — no clinical weighting of any kind</div>
   </div>
   <div class="s-body two-col">
@@ -340,12 +340,12 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
         <h3>⚠ Current State — FCFS</h3>
         <ul>
           <li>Queue order = arrival timestamp — nothing more</li>
-          <li>A stroke patient can sit behind a stable patient who simply arrived first</li>
+          <li>A patient with acute mesenteric ischemia can sit behind stable patients who simply arrived first</li>
         </ul>
       </div>
       <div class="info-box red" data-a="r1">
-        <div style="font-size:13px;font-weight:800;color:var(--red);margin-bottom:6px;">The cost of every minute</div>
-        <div style="font-size:15px;font-weight:800;color:var(--orange);line-height:1.4;">1.9 million neurons die every minute a stroke patient waits without reperfusion imaging.</div>
+        <div style="font-size:13px;font-weight:800;color:var(--red);margin-bottom:6px;">The cost of every hour</div>
+        <div style="font-size:15px;font-weight:800;color:var(--orange);line-height:1.4;">Bowel ischemia becomes irreversible infarction within 4–6 hours. Without urgent CT angiography, mortality exceeds 70%.</div>
       </div>
       <div class="info-box blue" data-a="r2" style="font-size:12px;font-weight:600;color:var(--blue);">
         → The AI model reorders the same patients into a clinically defensible sequence. No one is deprioritized — only given a more appropriate position.
@@ -373,7 +373,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
         </div>
         <div class="q-row stroke-row" style="border-left-color:var(--red);" data-a="l4">
           <div class="q-rank" style="background:rgba(230,57,70,0.1);color:var(--red);">#5</div>
-          <div><div class="q-id" style="color:var(--red);font-weight:800;">AF-05 · 13:58</div><div class="q-sub">STROKE · ESI 2 · Code 3 Protocol</div></div>
+          <div><div class="q-id" style="color:var(--red);font-weight:800;">AF-05 · 13:58</div><div class="q-sub">Mesenteric Ischemia · ESI 2 · Acute Abdomen</div></div>
           <span class="q-tag" style="color:var(--red);background:rgba(230,57,70,0.1);border-color:rgba(230,57,70,0.3);">CRITICAL — WAITS 5TH</span>
         </div>
         <div class="q-row" style="border-left-color:var(--dim);" data-a="l4">
@@ -450,7 +450,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   <div class="s-head">
     <div class="s-num" data-a="0">03 · LAYER 1</div>
     <h2 data-a="1">The Urgency Score — C1 Through C7</h2>
-    <div class="sub" data-a="2">Seven independent components · Score range: 5 (ESI-5, no risk factors) → ~220 (ESI-1, all modifiers maxed)</div>
+    <div class="sub" data-a="2">Seven independent components · Score range: 5 (ESI-5, no risk factors) → 213 (ESI-1, all modifiers maxed)</div>
   </div>
   <div class="s-body two-col">
     <div class="col">
@@ -460,11 +460,11 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
         <div class="sbar-row"><div class="sbar-label"><strong>C3</strong> — Imaging Modality Urgency</div><div class="sbar-track"><div class="sbar-fill" style="width:15%;background:linear-gradient(90deg,var(--blue),var(--cyan));" data-a="bar"></div></div><div class="sbar-num">+15</div></div>
         <div class="sbar-row"><div class="sbar-label"><strong>C4</strong> — Vital Sign Danger Zone</div><div class="sbar-track"><div class="sbar-fill" style="width:35%;background:linear-gradient(90deg,var(--orange),var(--yellow));" data-a="bar"></div></div><div class="sbar-num">+35</div></div>
         <div class="sbar-row"><div class="sbar-label"><strong>C5</strong> — Pain Scale (0–10)</div><div class="sbar-track"><div class="sbar-fill" style="width:8%;background:linear-gradient(90deg,var(--blue),var(--cyan));" data-a="bar"></div></div><div class="sbar-num">+8</div></div>
-        <div class="sbar-row"><div class="sbar-label"><strong>C6</strong> — Arrival Mode (Ambulance)</div><div class="sbar-track"><div class="sbar-fill" style="width:5%;background:linear-gradient(90deg,var(--blue),var(--cyan));" data-a="bar"></div></div><div class="sbar-num">+5</div></div>
+        <div class="sbar-row"><div class="sbar-label"><strong>C6</strong> — Transport Code</div><div class="sbar-track"><div class="sbar-fill" style="width:5%;background:linear-gradient(90deg,var(--blue),var(--cyan));" data-a="bar"></div></div><div class="sbar-num">+5</div></div>
         <div class="sbar-row"><div class="sbar-label"><strong>C7</strong> — Age Risk</div><div class="sbar-track"><div class="sbar-fill" style="width:10%;background:linear-gradient(90deg,var(--blue),var(--cyan));" data-a="bar"></div></div><div class="sbar-num">+10</div></div>
         <div style="margin-top:10px;padding:9px 0;border-top:2px solid rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Maximum Score</span>
-          <span style="font-size:24px;font-weight:800;color:var(--red);font-family:monospace;text-shadow:0 0 20px rgba(230,57,70,0.2);">~220</span>
+          <span style="font-size:24px;font-weight:800;color:var(--red);font-family:monospace;text-shadow:0 0 20px rgba(230,57,70,0.2);">213</span>
         </div>
       </div>
       <div class="info-box blue" data-a="4" style="font-size:11px;">
@@ -580,7 +580,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
       </div>
       <div class="card blue" data-a="r1">
         <h3>⏱ Delay Consequence Asymmetry</h3>
-        <p>For each patient in a tiebreaker pair, the AI reasons about what <em>specifically</em> happens at +20, +40, and +60 minutes of imaging delay — drawn directly from clinical time-sensitivity windows, not general knowledge.</p>
+        <p>For each patient in a tiebreaker pair, the AI reasons about what <em>specifically</em> happens at +20 and +60 minutes of imaging delay — drawn directly from clinical time-sensitivity windows, not general knowledge.</p>
       </div>
       <div class="conf-row" data-a="r2">
         <div class="conf-item" style="background:rgba(46,201,126,0.06);border-color:rgba(46,201,126,0.2);">
@@ -870,7 +870,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   <div class="slide-inner" style="max-width:650px;">
     <div data-a="0" style="font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;">Nebraska Medicine · Emergency Department</div>
     <div data-a="1" class="final-tagline">
-      The queue doesn't know<br>who's dying.<br>
+      The queue doesn't know<br>who's at risk.<br>
       <span class="glow-text" id="finalTagline"></span>
     </div>
     <div data-a="2" style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.65;max-width:500px;margin:12px auto 14px;">
@@ -1092,13 +1092,19 @@ const DEMO_STEPS = [
   {
     num:'01', title:'Busy Afternoon — 6 Patients Loaded',
     desc:'Loading the afternoon scenario: 6 ED patients ranging from UTI to acute stroke. The login screen is bypassed — demo mode launches directly into the queue.',
-    auto: async (iw) => {
+    auto: async () => {
       setStatus('Loading scenario...', 'var(--cyan)');
-      if (iw && iw.demoReset) { iw.demoReset(); }
+      iframeReady = false;
+      iframe.src = './index.html';
+      await new Promise(resolve => iframe.addEventListener('load', resolve, { once: true }));
+      iframeReady = true;
+      await delay(200);
+      const freshIW = getIW();
+      if (freshIW && freshIW.enterDemo) freshIW.enterDemo();
       await delay(600);
-      const aiQ = iw?.document?.getElementById('aiQueue');
+      const aiQ = freshIW?.document?.getElementById('aiQueue');
       if (aiQ) aiQ.scrollTop = 0;
-      const fcfsQ = iw?.document?.getElementById('fcfsQueue');
+      const fcfsQ = freshIW?.document?.getElementById('fcfsQueue');
       if (fcfsQ) fcfsQ.scrollTop = 0;
       sndSuccess();
       setStatus('Loaded', 'var(--green)');
